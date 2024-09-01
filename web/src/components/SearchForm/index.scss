@@ -1,0 +1,65 @@
+
+
+.search-container {
+  overflow: hidden;
+  :deep(.search-form) {
+    .el-row {
+      .el-col {
+        .el-form-item {
+          margin-bottom: 20px;
+          .el-form-item__label {
+            font-family: PingFangSC, PingFang SC;
+            font-weight: 400;
+            font-size: 16px;
+            color: #000000;
+            line-height: 14px;
+            text-align: left;
+            font-style: normal;
+            text-transform: none;
+            margin-bottom: 10px;
+          }
+          .el-form-item__content {
+            .el-input, .el-cascader {
+              width: 100%;
+              &::placeholder{
+                font-family: PingFangSC, PingFang SC;
+                font-weight: 400;
+                font-size: 16px;
+                color: #999999;
+                line-height: 22px;
+                text-align: left;
+                font-style: normal;
+              }
+            }
+          }
+        }
+        .search-btn {
+          text-align: right;
+          padding-top: 23px;
+          .el-button {
+            width: 88px;
+            height: 32px;
+            background: #FFFFFF;
+            border-radius: 2px;
+            border: 1px solid #DFE5EC;
+            font-family: PingFangSC, PingFang SC;
+            font-weight: 400;
+            font-size: 16px;
+            color: #666666;
+            line-height: 22px;
+            text-align: left;
+            font-style: normal;
+            &:last-child {
+              background: #0B68DA;
+              color: #FFFFFF;
+            }
+          }
+          &.otherRow {
+            padding-bottom: 20px;
+            padding-top: 0px!important;
+          }
+        }
+      }
+    }
+  }
+}

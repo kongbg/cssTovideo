@@ -1,0 +1,40 @@
+.table-container {
+    margin-bottom: 20px;
+    :deep(.el-table) {
+        .el-table__inner-wrapper {
+            .el-table__header-wrapper {
+
+            }
+        }
+        thead {
+            color: red;
+            font-family: PingFangSC, PingFang SC;
+            font-weight: 500;
+            font-size: 16px;
+            color: rgba(0,0,0,0.85);
+            line-height: 16px;
+            text-align: right;
+            font-style: normal;
+            text-transform: none;
+            tr {
+                height: 46px;
+                th {
+                    background-color: #FAFAFA;
+                }
+            }
+        }
+        tbody {
+            tr {
+                height: 56px;
+                font-family: SourceHanSansCN, SourceHanSansCN;
+                font-weight: 400;
+                font-size: 16px;
+                color: #666666;
+                // line-height: 19px;
+                text-align: right;
+                font-style: normal;
+                text-transform: none;
+            }
+        }
+    }
+}
