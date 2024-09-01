@@ -7,13 +7,14 @@
         <keep-alive :include="keepAliveComponents" :max="10">
           <component :is="Component" />
         </keep-alive>
-    </Suspense>
+      </Suspense>
     </transition>
   </router-view>
 </template>
 
 <script setup>
 import useKeepAliveStore from '@/store/modules/keepAliveStore.js'
-const KeepAliveStore  = useKeepAliveStore();
+const KeepAliveStore = useKeepAliveStore();
 const keepAliveComponents = KeepAliveStore.getKeepAliveComponents;
 </script>
+<style lang="scss" scoped></style>
