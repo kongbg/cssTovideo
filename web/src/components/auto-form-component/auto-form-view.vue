@@ -62,7 +62,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import MobileLayerDraggableItem from "@/components/auto-form-component/draggable-item.vue"
 import MobileLayerAutoFormRight from "@/components/auto-form-component/auto-form-right.vue"
 import MobileLayerCodeTypeDialog from "@/components/auto-form-component/code-type-dialog.vue"
-import drawingDefault from "@/config/generator/drawingDefault.js";
+// import drawingDefault from "@/config/generator/drawingDefault.js";
 import { makeUpHtml, vueTemplate, vueScript, cssStyle } from '@/utils/generator/html'
 import { makeUpJs } from '@/utils/generator/js'
 import { makeUpCss } from '@/utils/generator/css'
@@ -77,12 +77,14 @@ const { id } = route.query
 let tempActiveData;
 let oldActiveId;
 
-const formConfigRef = reactive(formConf)
-console.log('drawingDefault:', drawingDefault)
+let formConfigRef = reactive(formConf)
+// console.log('drawingDefault:', drawingDefault)
 // let drawingList = reactive(drawingDefault)
+// const activeData = ref(drawingDefault[0])
+// const activeId = ref(drawingDefault[0].formId)
 let drawingList = reactive([])
-const activeData = ref(drawingDefault[0])
-const activeId = ref(drawingDefault[0].formId)
+const activeData = ref({})
+const activeId = ref('')
 const idGlobal = ref(100)
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
@@ -193,9 +195,13 @@ function generateCode() {
  */
 const saveLoading = ref(false)
 async function save() {
+  let config = {
+    formConf: formConfigRef,
+    drawingConf: drawingList
+  }
   let params = {
     id,
-    config: JSON.stringify(drawingList)
+    config: JSON.stringify(config)
   }
   saveLoading.value = true
   let res = await update(params);
@@ -214,10 +220,23 @@ async function getDetail() {
   let params = { id }
   let res = await getDetails(params);
   if (res.code == 200) {
-    let configs = JSON.parse(res.data.config) || []
-    configs.forEach(item => {
+    let config = JSON.parse(res.data.config) || {
+      formConf: formConf,
+      drawingConf: []
+    }
+
+
+    for (const key in config.formConf) {
+      formConfigRef[key] = config.formConf[key]
+    }
+    config.drawingConf.forEach(item => {
       drawingList.push(item)
     })
+
+    if (config.drawingConf.length) {
+      activeData.value = config.drawingConf[0]
+      activeId.value = config.drawingConf[0]?.formId
+    }
   } else {
 
   }

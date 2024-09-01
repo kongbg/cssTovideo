@@ -79,10 +79,11 @@ $lighterBlue: #409EFF;
 
     .el-scrollbar__view {
         height: 100%;
+        overflow-x: hidden;
     }
 
     .center-board-row {
-        padding: 12px 12px 15px 12px;
+        padding: 10px 10px 15px 10px;
         box-sizing: border-box;
         height: 100%;
         position: relative;
@@ -138,7 +139,7 @@ $lighterBlue: #409EFF;
         }
 
         .el-form-item {
-            margin-bottom: 15px;
+            margin-bottom: 0px;
         }
     }
 
@@ -165,13 +166,13 @@ $lighterBlue: #409EFF;
         position: relative;
         cursor: move;
         box-sizing: border-box;
-        border: 1px dashed #ccc;
+        // border: 1px dashed #ccc;
         border-radius: 3px;
-        padding: 0 2px;
+        // padding: 0 2px;
         margin-bottom: 15px;
 
         .drawing-row-item {
-            margin-bottom: 2px;
+            margin-bottom: 0px;
         }
 
         .el-col {
@@ -185,6 +186,7 @@ $lighterBlue: #409EFF;
         .drag-wrapper {
             width: 100%;
             min-height: 80px;
+            border: 1px dashed #ccc;
         }
 
         &.active-from-item {
