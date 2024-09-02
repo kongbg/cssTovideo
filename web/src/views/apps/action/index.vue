@@ -11,7 +11,9 @@
             </div>
             <div class="info">
                 <div class="label">访问地址：</div>
-                <div class="value">{{ baseInfo.url }}</div>
+                <div class="value">
+                    <el-link type="primary" @click="preView(baseInfo.url)">{{ baseInfo.url }}</el-link>
+                </div>
             </div>
             <div class="info">
                 <div class="label">应用描述：</div>
@@ -62,9 +64,18 @@ async function getDetail() {
     let res = await getDetails(params);
     if (res.code == 200) {
         baseInfo.value = res.data || {}
+        baseInfo.value.url = `${location.origin}/runtime/${baseInfo.value.id}`
     } else {
     }
 }
+
+/**
+ * 预览
+ */
+function preView(url) {
+    window.open(url)
+}
+
 
 /**
  * 页面数据初始化

@@ -34,7 +34,7 @@ const layouts = {
     return h(
         resolveComponent('el-col'), {
           span: element.span, class: className, onClick: (event) => {
-            onActiveItem(element);
+            onActiveItem && onActiveItem(element);
             event.stopPropagation()
           }
         }, {
@@ -124,7 +124,7 @@ export default defineComponent({
       type: Number
     },
     activeId: {
-      type: Number
+      type: String
     },
     formConf: {
       type: Object

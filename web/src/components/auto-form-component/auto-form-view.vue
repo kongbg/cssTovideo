@@ -26,6 +26,9 @@
     </div>
     <div class="auto-form-context">
       <div class="action-bar">
+        <el-button link :icon="DocumentCopy" @click="preView">
+          预览
+        </el-button>
         <el-button link :icon="DocumentCopy" v-loading="saveLoading" @click="save">
           保存
         </el-button>
@@ -44,7 +47,7 @@
       </UIEngine>
     </div>
     <div class="auto-form-right">
-      <auto-form-right v-model:active-data="activeData" :form-conf="formConfigRef" :show-field="!!drawingList.length"
+      <auto-form-right v-model:active-data="activeData" :appId="appId" :form-conf="formConfigRef" :show-field="!!drawingList.length"
         @tag-change="tagChange" />
     </div>
     <code-type-dialog v-model="dialogVisible" title="选择生成类型" :show-file-name="showFileName"
@@ -74,6 +77,7 @@ import { update, getDetails } from '@/api/page.js'
 
 const route = useRoute()
 const { id } = route.query
+const appId = ref('')
 let tempActiveData;
 let oldActiveId;
 
@@ -85,19 +89,33 @@ let formConfigRef = reactive(formConf)
 let drawingList = reactive([])
 const activeData = ref({})
 const activeId = ref('')
-const idGlobal = ref(100)
+const idGlobal = ref('')
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const showFileName = ref(false)
 const operationType = ref('')
 const generateConf = ref(null)
 const formData = ref({})
+const router = useRouter()
 // 防止 firefox 下 拖拽 会新打卡一个选项卡
 document.body.ondrop = event => {
   event.preventDefault()
   event.stopPropagation()
 }
 
+
+function getUUid(length = 12) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = '';
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersLength);
+    result += characters.charAt(randomIndex);
+  }
+  idGlobal.value = result;
+  return result;
+}
 
 const execFunction = {
   execRun: (data) => {
@@ -134,7 +152,7 @@ function activeFormItem(element) {
 
 function cloneComponent(origin) {
   const clone = JSON.parse(JSON.stringify(origin))
-  clone.formId = ++idGlobal.value
+  clone.formId = getUUid()
   clone.span = formConfigRef.span
   clone.renderKey = +new Date() // 改变renderKey后可以实现强制更新组件
 
@@ -191,6 +209,15 @@ function generateCode() {
 }
 
 /**
+ * 预览
+ */
+function preView() {
+  router.push({
+    path: `/runtime/${id}`
+  })
+}
+
+/**
  * 保存
  */
 const saveLoading = ref(false)
@@ -220,6 +247,9 @@ async function getDetail() {
   let params = { id }
   let res = await getDetails(params);
   if (res.code == 200) {
+    appId.value = res.data.appId
+    debugger
+
     let config = JSON.parse(res.data.config) || {
       formConf: formConf,
       drawingConf: []
@@ -229,6 +259,7 @@ async function getDetail() {
     for (const key in config.formConf) {
       formConfigRef[key] = config.formConf[key]
     }
+    // drawingList = []
     config.drawingConf.forEach(item => {
       drawingList.push(item)
     })
@@ -244,6 +275,7 @@ async function getDetail() {
 
 function init() {
   getDetail()
+  getUUid()
 }
 
 function copy() {
@@ -260,7 +292,7 @@ function drawingItemCopy(item, parent) {
 }
 
 function createIdAndKey(item) {
-  item.formId = ++idGlobal.value
+  item.formId = getUUid()
   item.renderKey = +new Date()
   if (item.layout === 'colFormItem') {
     item.vModel = `field${idGlobal.value}`
@@ -378,7 +410,11 @@ $geo-basic-footer-height: 6px;
 
 $selectedColor: #f6f7ff;
 $lighterBlue: #409EFF;
-
+.auto-form-context {
+    flex: 2;
+    box-sizing: border-box;
+    margin: 0 350px 0 260px;
+}
 .auto-form-view {
   height: calc(100% - $geo-basic-footer-height);
   display: flex;

@@ -29,7 +29,21 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item v-if="activeData.vModel!==undefined" label="字段名">
+          <el-form-item v-if="activeData.vModel!==undefined && formConf.modeId" label="字段名">
+            <el-select
+                v-model="activeData.vModel"
+                placeholder="请选择字段（v-model）"
+                :style="{width: '100%'}"
+            >
+                <el-option
+                    v-for="item in fieldList"
+                    :key="item.field"
+                    :label="item.name"
+                    :value="item.field">
+                </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="activeData.vModel!==undefined && !formConf.modeId" label="字段名">
             <el-input v-model="activeData.vModel" placeholder="请输入字段名（v-model）"/>
           </el-form-item>
 
@@ -387,9 +401,24 @@
           <el-form-item label="表单名">
             <el-input v-model="formConf.formRef" placeholder="请输入表单名（ref）" />
           </el-form-item>
-          <el-form-item label="表单模型">
-            <el-input v-model="formConf.formModel" placeholder="请输入数据模型" />
+          <el-form-item label="数据模型">
+            <el-select
+                v-model="formConf.modeId"
+                placeholder="请选择数据模型"
+                :style="{width: '100%'}"
+                @change="id => modeChange(id)"
+            >
+                <el-option
+                    v-for="item in modeList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                </el-option>
+            </el-select>
           </el-form-item>
+          <!-- <el-form-item label="表单模型">
+            <el-input v-model="formConf.formModel" placeholder="请输入数据模型" />
+          </el-form-item> -->
           <el-form-item label="校验模型">
             <el-input v-model="formConf.formRules" placeholder="请输入校验模型" />
           </el-form-item>
@@ -435,7 +464,6 @@
             <el-switch v-model="formConf.unFocusedComponentBorder" />
           </el-form-item>
         </el-form>
-
       </el-scrollbar>
     </div>
 
@@ -449,7 +477,7 @@ import draggable from 'vuedraggable'
 import {computed, defineProps, reactive, ref, resolveComponent, watch} from 'vue';
 import {componentsTypes, inputComponents, selectComponents} from "@/config/generator/config";
 import {CirclePlus, Minus, Operation, Plus, RemoveFilled} from '@element-plus/icons-vue'
-
+import { getData } from '@/api/mode.js'
 
 
 const currentTab = ref('field')
@@ -466,6 +494,10 @@ const props = defineProps({
   formConf: {
     type: Object,
     required: true
+  },
+  appId: {
+    type: String,
+    default: ''
   }
 })
 
@@ -489,6 +521,10 @@ const dateOptions = computed(() => {
   }
   return []
 })
+
+const modeList = ref([])
+
+const fieldList = ref([])
 
 const idGlobal = ref(120)
 
@@ -727,11 +763,47 @@ function addReg() {
   })
 }
 
+/**
+ * 修改模型
+ * @param {*} id 
+ * @param {*} activeData 
+ */
+function modeChange(id) {
+  let info = modeList.value.find(item => item.id == id);
+  if (info) {
+    fieldList.value = info.fieldJson ? JSON.parse(info.fieldJson) : []
+  }
+}
+
+/**
+ * 获取模型
+ */
+async function getModes() {
+  let res = await getData({ appId: props.appId, pageSize: 999})
+  if (res.code == 200) {
+    modeList.value = res.data.list || []
+    if (props.formConf.modeId) {
+      let info = modeList.value.find(item => item.id == props.formConf.modeId);
+      if (info) {
+        fieldList.value = info.fieldJson ? JSON.parse(info.fieldJson) : []
+      }
+    }
+  }
+}
+function init() {
+  console.log('props.activeData:', props.activeData)
+  getModes()
+}
+
 // 解决 切换了type draggable的tag后 不能滑动的bug
 watch(() => props.activeData.type, (value) => {
   props.activeData.renderKey = +new Date()
+  init()
 })
-
+watch(() => props.appId, () => {
+  init()
+})
+init()
 </script>
 
 <style lang="scss">

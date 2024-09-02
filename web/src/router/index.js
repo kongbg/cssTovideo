@@ -118,7 +118,7 @@ export const constantRoutes = [
   {
     path: "/runtime/:pageId",
     name: "Runtime",
-    component: () => import("@/views/dynamicPage/runtime/index.vue"),
+    component: () => import("@/views/runtime/index.vue"),
     meta: {
       title: "运行时"
     }
@@ -138,6 +138,8 @@ export const constantRoutes = [
         component: () => import("@/views/apps/index.vue"),
         meta: {
           title: "应用",
+          keepAlive: true,
+          keepAlivePages: ["AppsAction"]
         }
       },
       {
@@ -146,6 +148,8 @@ export const constantRoutes = [
         component: () => import("@/views/apps/action/index.vue"),
         meta: {
           title: "应用详情",
+          keepAlive: true,
+          keepAlivePages: ["DesginPage"]
         }
       },
     ]

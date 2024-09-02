@@ -32,11 +32,11 @@ export function useDict(...args) {
  * 字典转中文
  */
 export function formatDict(val, dict, split=',', props= {label:'label', value:'value'}) {
-  if (getType(dict) != 'string') {
+  if (getType(dict) == 'string') {
     let res = useDict(dict)
-    dict = ref[dict]
+    dict = res[dict]
   }
-  if (getType(val) != 'array') {
+  if (getType(val) == 'array') {
     let info = dict.find(item => item[props.value] == val);
     if (info) {
       return info[props.label]

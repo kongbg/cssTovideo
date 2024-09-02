@@ -29,15 +29,15 @@ const drawingList = defineModel('drawingList')
 const activeId = defineModel('activeId')
 const props = defineProps({
     activeFormItem: {
-        type: Object,
+        type: Function,
         default: () => { }
     },
     drawingItemCopy: {
-        type: Object,
+        type: Function,
         default: () => { }
     },
     drawingItemDelete: {
-        type: Object,
+        type: Function,
         default: () => { }
     },
     mode: { // 运行模式 desgin  runtime
@@ -53,16 +53,11 @@ $selectedColor: #f6f7ff;
 $lighterBlue: #409EFF;
 
 .auto-form-context {
-    flex: 2;
-    box-sizing: border-box;
-    margin: 0 350px 0 260px;
-
     .action-bar {
         position: relative;
         height: 45px;
         padding: 0 15px;
         box-sizing: border-box;
-        ;
         border: 1px solid #f1e8e8;
         display: flex;
         justify-content: right;
@@ -218,6 +213,12 @@ $lighterBlue: #409EFF;
             }
         }
 
+        &.active-from-item {
+            .el-form-item {
+                border: 1px dashed $lighterBlue;
+            }
+        }
+
         .drawing-item-copy,
         .drawing-item-delete {
             display: none;
@@ -255,6 +256,29 @@ $lighterBlue: #409EFF;
             &:hover {
                 background: #F56C6C;
                 color: #fff;
+            }
+        }
+    }
+
+    .runtime {
+        .drawing-item,
+        .drawing-row-item {
+            &:hover {
+                .el-form-item {
+                    background: #fff;
+                    border-radius: 0px;
+                }
+
+                .drawing-item-copy,
+                .drawing-item-delete {
+                    display: none;
+                }
+            }
+            .drag-wrapper {
+                border-color: transparent;
+            }
+            .component-name {
+                display: none;
             }
         }
     }

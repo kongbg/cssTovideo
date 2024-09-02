@@ -13,9 +13,11 @@
                 <span class="custom-tree-node">
                     <span>{{ node.label }}</span>
                     <div class="btns">
+                        <el-button type="primary" link @click="tableBtnFn('setHome', node.data)">设为首页</el-button>
+                        <!-- <el-button type="primary" link @click="tableBtnFn('setHome', node.data)">{{node.data.isHome ? '取消首页' : '设为首页'}}</el-button> -->
                         <el-button type="primary" link @click="tableBtnFn('edit', node.data)">编辑</el-button>
                         <el-button type="primary" link @click="tableBtnFn('desgin', node.data)">设计</el-button>
-                        <el-button type="primary" link @click="tableBtnFn('create', node.data)">新增</el-button>
+                        <!-- <el-button type="primary" link @click="tableBtnFn('create', node.data)">新增</el-button> -->
                         <el-button type="danger" link @click="tableBtnFn('delete', node.data)">删除</el-button>
                     </div>
                 </span>

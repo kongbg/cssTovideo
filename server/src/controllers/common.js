@@ -1,4 +1,17 @@
 import https from 'https'
+import SQLiteDB from '../sqlite/index.js'
+import Mode from '../mode/index.js'
+import path from 'path'
+
+const __dirname = path.resolve();
+let dbPath = path.join(__dirname + "/config/data.db")
+// 模型
+const tableName = 'modes'
+
+// 创建数据库连接
+const db = new SQLiteDB(dbPath)
+const mode = new Mode(tableName, db)
+
 export default class commonController {
   /**
    * 上传
@@ -65,5 +78,39 @@ export default class commonController {
     //   data: res,
     //   msg: !err ? 'ok' : (err.msg || err.code)
     // }
+  }
+  /**
+   * 通过pageId modeId 获取数据
+   */
+  static async getDataByModeId(ctx) {
+    let { pageId, modeId, type } = ctx.request.body;
+    const query = {
+      id: modeId,
+      page: 1,
+      pageSize: 1
+    }
+
+    let [err, res] = await mode.getData(query)
+    if (!err) {
+      let tableName = res.data.tableName;
+      const newMode = new Mode(tableName, db)
+      if(type == 'from') {
+        const query = {
+          page: 1,
+          pageSize: 1
+        }
+    
+        let [err, res] = await newMode.getData(query)
+        let { data=[], total=0, totalPages=0 } = res || {};
+    
+        let result = {
+          code: !err ? 200 : 400,
+          data: data.length ? data[0] : null,
+          msg: !err ? 'ok' : (err.msg || err.code)
+        }
+        ctx.body = result
+      }
+
+    }
   }
 }

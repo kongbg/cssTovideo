@@ -1,7 +1,7 @@
 <template>
   <div class="auto-form-view">
     <div class="auto-form-context">
-      <UIEngine :formConf="formConf" :formConfigRef="formConfigRef" :drawingList="drawingList" mode="runtime">
+      <UIEngine :formConf="formConf" :formConfigRef="formConfigRef" :drawingList="drawingList" mode="runtime" >
       </UIEngine>
     </div>
   </div>
@@ -12,9 +12,10 @@ import { formConf } from "@/config/generator/config.js"
 import { onMounted, reactive } from "vue";
 import UIEngine from "./UIEngine.vue";
 import { getDetails } from '@/api/page.js'
+import { getDataByModeId } from '@/api/common.js'
 
 const route = useRoute()
-const { id } = route.query
+const { pageId: id } = route.params
 const formConfigRef = reactive(formConf)
 let drawingList = reactive([])
 
@@ -26,8 +27,16 @@ async function getDetail() {
   let params = { id }
   let res = await getDetails(params);
   if (res.code == 200) {
-    let configs = JSON.parse(res.data.config) || []
-    configs.forEach(item => {
+    let config = JSON.parse(res.data.config) || {
+      formConf: formConf,
+      drawingConf: []
+    }
+
+    for (const key in config.formConf) {
+      formConfigRef[key] = config.formConf[key]
+    }
+
+    config.drawingConf.forEach(item => {
       drawingList.push(item)
     })
   } else {
@@ -35,8 +44,22 @@ async function getDetail() {
   }
 }
 
-function init() {
-  getDetail()
+/**
+ * 通过页面id获取数据
+ */
+ async function getPageData() {
+  let params = { pageId: id, modeId: formConfigRef.modeId, type: 'form' }
+  let res = await getDataByModeId(params);
+  if (res.code == 200) {
+    console.log('getModeDetail:',res.data)
+  } else {
+
+  }
+}
+
+async function init() {
+  await getDetail()
+  getPageData()
 }
 
 function drawingItemCopy(item, parent) { }
