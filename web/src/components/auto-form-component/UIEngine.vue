@@ -135,6 +135,12 @@ $lighterBlue: #409EFF;
 
         .el-form-item {
             margin-bottom: 0px;
+            &.custom-el-button {
+                .el-form-item__label {
+                    padding-right: 0;
+                    overflow: hidden;
+                }
+            }
         }
     }
 

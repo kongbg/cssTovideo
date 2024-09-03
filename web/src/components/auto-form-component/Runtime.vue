@@ -15,7 +15,7 @@ import { getDetails } from '@/api/page.js'
 import { getDataByModeId } from '@/api/common.js'
 
 const route = useRoute()
-const { pageId: id } = route.params
+const { pageId, id } = route.params
 const formConfigRef = reactive(formConf)
 let drawingList = reactive([])
 
@@ -24,7 +24,7 @@ let drawingList = reactive([])
  * 获取页面配置
  */
 async function getDetail() {
-  let params = { id }
+  let params = { id: pageId }
   let res = await getDetails(params);
   if (res.code == 200) {
     let config = JSON.parse(res.data.config) || {
@@ -48,7 +48,7 @@ async function getDetail() {
  * 通过页面id获取数据
  */
  async function getPageData() {
-  let params = { pageId: id, modeId: formConfigRef.modeId, type: 'form' }
+  let params = { pageId, modeId: formConfigRef.modeId, id, type: 'form' }
   let res = await getDataByModeId(params);
   if (res.code == 200) {
     console.log('getModeDetail:',res.data)

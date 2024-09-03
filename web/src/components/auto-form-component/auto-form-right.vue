@@ -51,8 +51,12 @@
             {{ activeData.componentName }}
           </el-form-item>
 
-          <el-form-item v-if="activeData.label!==undefined" label="标题">
+          <el-form-item v-if="activeData.label!==undefined && activeData.tag != 'el-button'" label="标题">
             <el-input v-model="activeData.label" placeholder="请输入标题"/>
+          </el-form-item>
+
+          <el-form-item v-if="activeData['btn-text']!==undefined" label="按钮文案">
+            <el-input v-model="activeData['btn-text']" placeholder="请输入按钮文案"/>
           </el-form-item>
 
           <el-form-item v-if="activeData.placeholder!==undefined" label="占位提示">

@@ -7,6 +7,7 @@ import 'element-plus/dist/index.css'
 
 import JsonEditorVue from 'json-editor-vue3'
 import ComponentAutoRegister from "@/utils/ComponentAutoRegister"
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import store from './store'
 import router from './router'
@@ -14,6 +15,10 @@ import router from './router'
 import App from './App.vue'
 
 const app = createApp(App)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+  }
 
 new ComponentAutoRegister(app, import.meta.glob('@/components/**/*.vue'));
 

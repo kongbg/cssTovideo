@@ -83,7 +83,7 @@ export default class commonController {
    * 通过pageId modeId 获取数据
    */
   static async getDataByModeId(ctx) {
-    let { pageId, modeId, type } = ctx.request.body;
+    let { pageId, modeId, id, type } = ctx.request.body;
     const query = {
       id: modeId,
       page: 1,

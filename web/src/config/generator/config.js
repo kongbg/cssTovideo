@@ -18,7 +18,7 @@ export const inputComponents = [
         label: '单行文本',
         tag: 'el-input',
         tagIcon: 'input',
-        modeId: '',
+        
         placeholder: '请输入',
         defaultValue: undefined,
         span: 24,
@@ -42,7 +42,7 @@ export const inputComponents = [
         tag: 'el-input',
         type: "number",
         tagIcon: 'decimals',
-        modeId: '',
+        
         placeholder: '请输入',
         defaultValue: undefined,
         span: 24,
@@ -66,7 +66,7 @@ export const inputComponents = [
         tag: 'el-input',
         type: "number",
         tagIcon: 'number',
-        modeId: '',
+        
         placeholder: '请输入',
         defaultValue: undefined,
         span: 24,
@@ -90,7 +90,7 @@ export const inputComponents = [
         tag: 'el-input',
         tagIcon: 'textarea',
         type: 'textarea',
-        modeId: '',
+        
         placeholder: '请输入',
         defaultValue: undefined,
         span: 24,
@@ -112,7 +112,7 @@ export const inputComponents = [
         label: '密码',
         tag: 'el-input',
         tagIcon: 'password',
-        modeId: '',
+        
         placeholder: '请输入',
         defaultValue: undefined,
         span: 24,
@@ -136,7 +136,7 @@ export const inputComponents = [
         label: '计数器',
         tag: 'el-input-number',
         tagIcon: 'number',
-        modeId: '',
+        
         placeholder: '',
         defaultValue: undefined,
         span: 24,
@@ -159,7 +159,7 @@ export const selectComponents = [
         label: '下拉选择',
         tag: 'el-select',
         tagIcon: 'select',
-        modeId: '',
+        
         placeholder: '请选择',
         defaultValue: '',
         span: 24,
@@ -184,7 +184,7 @@ export const selectComponents = [
         label: '级联选择',
         tag: 'el-cascader',
         tagIcon: 'cascader',
-        modeId: '',
+        
         placeholder: '请选择',
         defaultValue: [],
         span: 24,
@@ -220,7 +220,7 @@ export const selectComponents = [
         label: '单选框组',
         tag: 'el-radio-group',
         tagIcon: 'radio',
-        modeId: '',
+        
         defaultValue: undefined,
         span: 24,
         labelWidth: null,
@@ -244,7 +244,7 @@ export const selectComponents = [
         label: '多选框组',
         tag: 'el-checkbox-group',
         tagIcon: 'checkbox',
-        modeId: '',
+        
         defaultValue: [],
         span: 24,
         labelWidth: null,
@@ -267,7 +267,7 @@ export const selectComponents = [
         label: '开关',
         tag: 'el-switch',
         tagIcon: 'switch',
-        modeId: '',
+        
         defaultValue: false,
         span: 24,
         labelWidth: null,
@@ -288,7 +288,7 @@ export const selectComponents = [
         label: '滑块',
         tag: 'el-slider',
         tagIcon: 'slider',
-        modeId: '',
+        
         defaultValue: null,
         span: 24,
         labelWidth: null,
@@ -306,7 +306,7 @@ export const selectComponents = [
         label: '时间选择',
         tag: 'el-time-picker',
         tagIcon: 'time',
-        modeId: '',
+        
         placeholder: '请选择',
         defaultValue: null,
         span: 24,
@@ -327,7 +327,7 @@ export const selectComponents = [
         label: '时间范围',
         tag: 'el-time-picker',
         tagIcon: 'time-range',
-        modeId: '',
+        
         defaultValue: null,
         span: 24,
         labelWidth: null,
@@ -348,7 +348,7 @@ export const selectComponents = [
         label: '日期选择',
         tag: 'el-date-picker',
         tagIcon: 'date',
-        modeId: '',
+        
         placeholder: '请选择',
         defaultValue: null,
         type: 'date',
@@ -368,7 +368,7 @@ export const selectComponents = [
         label: '日期范围',
         tag: 'el-date-picker',
         tagIcon: 'date-range',
-        modeId: '',
+        
         defaultValue: null,
         span: 24,
         labelWidth: null,
@@ -390,7 +390,7 @@ export const selectComponents = [
         label: '评分',
         tag: 'el-rate',
         tagIcon: 'rate',
-        modeId: '',
+        
         defaultValue: 0,
         span: 24,
         labelWidth: null,
@@ -409,7 +409,7 @@ export const selectComponents = [
         label: '颜色选择',
         tag: 'el-color-picker',
         tagIcon: 'color',
-        modeId: '',
+        
         defaultValue: null,
         labelWidth: null,
         'show-alpha': false,
@@ -424,7 +424,7 @@ export const selectComponents = [
         label: '上传',
         tag: 'el-upload',
         tagIcon: 'upload',
-        modeId: '',
+        
         action: 'https://jsonplaceholder.typicode.com/posts/',
         defaultValue: null,
         labelWidth: null,
@@ -457,14 +457,13 @@ export const layoutComponents = [
     }
 ]
 
-
 export const headTitleComponents = [
     {
         label: '一级标题',
         tag: 'h1',
         tagIcon: 'title-h1',
         changeTag: true,
-        modeId: '',
+        
         style: {
             flex: 1,
             color: "#1A93F9",
@@ -482,7 +481,7 @@ export const headTitleComponents = [
         tag: 'h2',
         tagIcon: 'title-h2',
         changeTag: true,
-        modeId: '',
+        
         style: {
             flex: 1,
             color: "#1A93F9",
@@ -499,34 +498,15 @@ export const headTitleComponents = [
 
 export const actionComponents = [
     {
-        label: '开关2',
-        tag: 'el-switch',
-        tagIcon: 'switch',
-        modeId: '',
-        defaultValue: false,
-        span: 24,
-        labelWidth: null,
-        style: {
-            '--el-switch-on-color': null,
-            '--el-switch-off-color': null,
-        },
-        disabled: false,
-        required: true,
-        'active-text': '',
-        'inactive-text': '',
-        'active-value': true,
-        'inactive-value': false,
-        regList: [],
-        changeTag: true
-    },
-    {
         label: '按钮',
         tag: 'el-button',
         tagIcon: 'button',
-        modeId: '',
-        disabled: true,
-        changeTag: true,
+        'btn-text': '点击我！',
+        'formItem': false,
+        disabled: false,
+        changeTag: false,
         span: 24,
+        labelWidth: '0'
     }
 ]
 

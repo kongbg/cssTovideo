@@ -1,7 +1,12 @@
 <template>
   <component :is="props.conf.tag" v-bind="cloneConf"  v-model="valueVal" >
-      <template #default v-for="(itm,childKey) in form.componentChild[props.conf?.tag]">
+      <template #default>
+        <!-- el-button 类型， 若非el-button 类型 不能实现则需要继续扩展-->
+        <template v-if="props.conf.tag == 'el-button'">{{ props.conf['btn-text'] }}</template>
+        <!-- 非el-button 类型-->
+        <template v-else v-for="(item, childKey) in form.componentChild[props.conf?.tag]">
           <Childer  v-if="props.conf[childKey]"  :tag="props.conf.tag" :conf="props.conf" :child-key="childKey" />
+        </template>
       </template>
   </component>
 </template>
@@ -65,6 +70,8 @@ const Childer = defineComponent({
     }
   },
   setup(props,{attrs}) {
+    console.log('props:', props)
+    debugger
     return () => h('div', null , [form.componentChild[props.tag][props.childKey]?.(h, props.conf, props.childKey)]);
   },
 });
