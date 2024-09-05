@@ -5,7 +5,6 @@ import crypto from 'crypto'
 
 const __dirname = path.resolve();
 let dbPath = path.join(__dirname + "/config/data.db")
-let tableDBPath = path.join(__dirname + "/config/table.db")
 // 模型
 const tableName = 'modes'
 

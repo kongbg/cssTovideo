@@ -1,3 +1,5 @@
+import { getData as getModesData } from '@/api/mode.js'
+window.getModesData = getModesData
 export const formConf = {
     formRef: 'formRefObj',
     formModel: 'formData',
@@ -22,6 +24,13 @@ export const formConfSchema =ref([
     },
     {
         type: 'input',
+        label: '表单ID',
+        prop: 'formId',
+        value: '',
+        disabled: true
+    },
+    {
+        type: 'input',
         label: '校验模型',
         placeholder: "请输入校验模型",
         prop: 'formModel',
@@ -34,11 +43,11 @@ export const formConfSchema =ref([
         placeholder: "请选择数据模型",
         prop: 'modeId',
         value: '',
-        api: async () =>{
-            let res = await getOptions();
+        api: async (id) =>{
+            let res = await getModesData();
             let { code, data, msg } = res;
             if (code == 200) {
-                return data;
+                return data.list;
             }
             return [];
         },
@@ -589,6 +598,14 @@ export const layoutComponents = [
                 max: 24,
                 min: 0
             },
+            // gutter: {
+            //     type: 'input-number',
+            //     label: '栅格间隔',
+            //     prop: 'gutter',
+            //     value: 0,
+            //     defaultData: 0,
+            //     unit: 'px'
+            // },
             // height: {
             //     type: 'input-number',
             //     label: '高度',
@@ -670,6 +687,7 @@ export const actionComponents = [
     {
         label: '按钮',
         tag: 'el-button',
+        layout: 'divItem',
         // tagIcon: 'button',
         // 'btn-text': '点击我！',
         // 'formItem': false,

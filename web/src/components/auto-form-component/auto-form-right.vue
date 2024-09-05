@@ -1,8 +1,8 @@
 <template>
   <div class="auto-right">
-    <el-tabs v-model="currentTab" class="center-tabs" :style="{'--el-tabs-header-height': '40px'}">
-      <el-tab-pane label="组件属性" name="field"/>
-      <el-tab-pane label="表单属性" name="form"/>
+    <el-tabs v-model="currentTab" class="center-tabs" :style="{ '--el-tabs-header-height': '40px' }">
+      <el-tab-pane label="组件属性" name="field" />
+      <el-tab-pane label="表单属性" name="form" />
     </el-tabs>
 
     <div class="field-box">
@@ -14,16 +14,15 @@
       </el-scrollbar>
     </div>
 
-    <auto-form-tree-node-dialog v-if="dialogVisible"  @commit="addNode" @close="()=>{dialogVisible = false}" />
+    <auto-form-tree-node-dialog v-if="dialogVisible" @commit="addNode" @close="() => { dialogVisible = false }" />
 
   </div>
 </template>
 
 <script setup>
-import draggable from 'vuedraggable'
-import {computed, defineProps, reactive, ref, resolveComponent, watch} from 'vue';
-import {componentsTypes, inputComponents, selectComponents} from "@/config/generator/config";
-import {CirclePlus, Minus, Operation, Plus, RemoveFilled} from '@element-plus/icons-vue'
+import { computed, defineProps, reactive, ref, resolveComponent, watch } from 'vue';
+import { componentsTypes, inputComponents, selectComponents } from "@/config/generator/config";
+import { CirclePlus, Minus, Operation, Plus, RemoveFilled } from '@element-plus/icons-vue'
 import { getData } from '@/api/mode.js'
 
 
@@ -40,7 +39,7 @@ const props = defineProps({
   },
   formConfSchema: {
     type: Object,
-    default: ()=>{}
+    default: () => { }
   },
   appId: {
     type: String,
@@ -58,8 +57,8 @@ const layoutTreeProps = ref({
 
 const dateOptions = computed(() => {
   if (
-      props.activeData.type !== undefined
-      && props.activeData.tag === 'el-date-picker'
+    props.activeData.type !== undefined
+    && props.activeData.tag === 'el-date-picker'
   ) {
     if (props.activeData['start-placeholder'] === undefined) {
       return dateTypeOptions
@@ -249,26 +248,26 @@ function renderAppend(data) {
 }
 
 function renderRemove(node, data) {
-  const {parent} = node
+  const { parent } = node
   const children = parent.data.children || parent.data
   const index = children.findIndex(d => d.id === data.id)
   children.splice(index, 1)
 }
 
-function renderContent(h, {node, data, store}) {
-  return h('div', {class: 'custom-tree-node'}, [
+function renderContent(h, { node, data, store }) {
+  return h('div', { class: 'custom-tree-node' }, [
     h('span', null, [node.label]),
-    h('span', {class: 'node-operation'}, [
+    h('span', { class: 'node-operation' }, [
       h(resolveComponent('el-icon'), {
         title: '添加',
         class: 'el-icon-plus',
         onClick: () => renderAppend(data)
-      }, {default: () => h(Plus)}),
+      }, { default: () => h(Plus) }),
       h(resolveComponent('el-icon'), {
         title: '删除',
         class: 'el-icon-delete',
         onClick: () => renderRemove(node, data)
-      }, {default: () => h(Minus)})
+      }, { default: () => h(Minus) })
     ])
   ]);
 }
@@ -293,7 +292,7 @@ function rateTextChange(val) {
 function rateScoreChange(val) {
   if (val) props.activeData['show-text'] = false
 }
-function multipleChange (val) {
+function multipleChange(val) {
   if (val) {
     props.activeData.defaultValue = []
   } else {
@@ -327,24 +326,17 @@ function modeChange(id) {
  * 获取模型
  */
 async function getModes() {
-  let res = await getData({ appId: props.appId, pageSize: 999})
+  let res = await getData({ appId: props.appId, pageSize: 999 })
   if (res.code == 200) {
     modeList.value = res.data.list || []
-    // console.log('formConfSchema:', props.formConfSchema.confs['mode'])
-    let confs = props.formConfSchema.confs ? JSON.parse(props.formConfSchema.confs) : {};
-    // console.log('confsconfsconfs:', props.formConfSchema)
-    // let modeId = confs[[]]
-    // todo formConf -> formConfSchema
-    if (props.formConf.modeId) {
-      let info = modeList.value.find(item => item.id == props.formConf.modeId);
-      if (info) {
-        fieldList.value = info.fieldJson ? JSON.parse(info.fieldJson) : []
-      }
+    let modeInfo = props.formConfSchema.find(item => item.prop == "modeId")
+    if (modeInfo) {
+      // console.log('modeInfo:', modeInfo)
+      // fieldList.value = info.fieldJson ? JSON.parse(info.fieldJson) : []
     }
   }
 }
 function init() {
-  console.log('props.activeData:', props.activeData)
   getModes()
 }
 
@@ -368,6 +360,7 @@ init()
   .field-box {
     box-sizing: border-box;
     height: calc(100% - 40px);
+
     .right-scrollbar {
       height: calc(100% - 40px);
     }
@@ -381,7 +374,7 @@ init()
       float: right;
     }
 
-    i[class*="el-icon"] + i[class*="el-icon"] {
+    i[class*="el-icon"]+i[class*="el-icon"] {
       margin-left: 6px;
     }
 
@@ -423,12 +416,12 @@ init()
       color: #f56c6c;
     }
 
-    & .el-input + .el-input {
+    & .el-input+.el-input {
       margin-left: 4px;
     }
   }
 
-  .select-item + .select-item {
+  .select-item+.select-item {
     margin-top: 4px;
   }
 

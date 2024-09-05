@@ -3,7 +3,7 @@
         <el-form size="small" label-width="90px">
             <!-- 组件名称 -->
             <el-form-item v-if="activeData && activeData.componentName" label="组件名称">
-                    <el-input v-model="activeData.componentName" disabled />
+                <el-input v-model="activeData.componentName" disabled />
             </el-form-item>
             <template v-for="info in schema">
                 <!-- 输入框 -->
@@ -24,7 +24,8 @@
                 <!-- tab-radio -->
                 <el-form-item v-if="info.type == 'tab-radio'" :label="info.label">
                     <el-radio-group v-model="info.value">
-                        <el-radio-button v-for="item in info.options" :label="item.value">  {{ item.label }} </el-radio-button>
+                        <el-radio-button v-for="item in info.options" :label="item.value"> {{ item.label }}
+                        </el-radio-button>
                     </el-radio-group>
                 </el-form-item>
                 <!-- 数字输入 -->
@@ -37,7 +38,7 @@
                 </el-form-item>
                 <!-- 滑块 -->
                 <el-form-item v-if="info.type == 'slider'" :label="info.label">
-                    <el-slider v-model="info.value" :max="info.max" :min="info.min" :marks="{12:''}"/>
+                    <el-slider v-model="info.value" :max="info.max" :min="info.min" :marks="{ 12: '' }" />
                 </el-form-item>
                 <!-- margin-padding -->
                 <el-form-item v-if="info.type == 'margin-padding'" :label="info.label">
@@ -52,7 +53,7 @@
 </template>
 <script setup>
 import { watch } from "vue"
-
+import { getData } from '@/api/mode.js'
 const props = defineProps({
     schema: {
         type: Array,
@@ -60,18 +61,18 @@ const props = defineProps({
     },
     activeData: {
         type: Object,
-        default: () => {}
+        default: () => { }
     }
 })
 
-watch(()=> props.schema, () =>{
+watch(() => props.schema, () => {
     initPanel()
 })
 
 // 定义时间组件的默认值
 let valueMap = {
-  'datetimerange': () => { return [] },
-  'daterange': () => { return [] },
+    'datetimerange': () => { return [] },
+    'daterange': () => { return [] },
 }
 
 // 联动的父级变动
@@ -104,13 +105,10 @@ function submit(params) {
 
 // 初始化表单数据
 async function initPanel() {
-    
-    debugger
     const configs = props.schema;
-    console.log('initPanel:', configs)
-    if(Array.isArray(configs)) {
+    if (Array.isArray(configs)) {
         configs.forEach(async item => {
-           await initConf(item)
+            await initConf(item)
         })
     } else {
         for (const key in configs) {
@@ -118,7 +116,7 @@ async function initPanel() {
             await initConf(item)
         }
     }
-    async function initConf (item) {
+    async function initConf(item) {
         // 配置了api 并且 是联动一级才自动请求数据
         if (item.api) {
             // 联动节点的 parent 才需要自动获取数据

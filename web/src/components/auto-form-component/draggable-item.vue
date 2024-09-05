@@ -60,10 +60,10 @@ const layouts = {
                     onClick: (event) => {
                       if (element.eventId) {
                         let FnObj = element.events.find(item => item.value == element.eventId)
-                        if(FnObj) {
+                        if (FnObj) {
                           console.log(FnObj.value)
                           let action = FnObj.value
-                          proxy.$emit('handleEvent', {action, element})
+                          proxy.$emit('handleEvent', { action, element })
                         }
                       }
                       event.stopPropagation()
@@ -129,6 +129,23 @@ const layouts = {
     }
     );
 
+  },
+  divItem(h, element, index, parent, attrs) {
+    const { onActiveItem } = attrs
+    const className = this.activeId === element.formId ? 'div-item active-div-item' : 'div-item'
+    const _this = this
+
+    return h(resolveComponent('div'), {
+      class: className
+    }, {
+      default: () => [
+        h(resolveComponent('el-button'),
+          {
+
+          }),
+        components.itemBtns.apply(this, arguments)
+      ]
+    })
   }
 }
 
@@ -155,7 +172,7 @@ export default defineComponent({
     },
     formData: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   setup(props, { attrs }) {
@@ -191,7 +208,7 @@ function getDrawingRowItem(params) {
 function dragWrapperStyle(params) {
   let confs = params.confs || {}
   let obj = {}
-  
+
   return obj
 }
 

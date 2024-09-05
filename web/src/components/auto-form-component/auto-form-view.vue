@@ -42,13 +42,13 @@
           清空
         </el-button>
       </div>
-      <UIEngine :formConf="formConf" :formData="formData" :formConfigRef="formConfigRef" :drawingList="drawingList" :activeId="activeId"
+      <UIEngine :formData="formData" :formConfSchema="formConfSchemas" :drawingList="drawingList" :activeId="activeId"
         :activeFormItem="activeFormItem" :drawingItemCopy="drawingItemCopy" :drawingItemDelete="drawingItemDelete">
       </UIEngine>
     </div>
     <div class="auto-form-right">
-      <auto-form-right v-model:active-data="activeData" :appId="appId" :formConfSchema="formConfSchema" :show-field="!!drawingList.length"
-        @tag-change="tagChange" />
+      <auto-form-right v-model:active-data="activeData" :appId="appId" :formConfSchema="formConfSchemas"
+        :show-field="!!drawingList.length" @tag-change="tagChange" />
     </div>
     <code-type-dialog v-model="dialogVisible" title="选择生成类型" :show-file-name="showFileName"
       @update:visible="generateUpdate" @confirm="generate" />
@@ -81,8 +81,7 @@ const appId = ref('')
 let tempActiveData;
 let oldActiveId;
 
-let formConfSchemas = reactive(formConfSchema)
-// console.log('drawingDefault:', drawingDefault)
+let formConfSchemas = reactive(formConfSchema.value)
 // let drawingList = reactive(drawingDefault)
 // const activeData = ref(drawingDefault[0])
 // const activeId = ref(drawingDefault[0].formId)
@@ -134,6 +133,7 @@ const execFunction = {
 
 function onEnd(obj, a) {
   if (obj.from !== obj.to) {
+    debugger
     activeData.value = tempActiveData
     initInputNumber(activeData.value)
     activeId.value = idGlobal.value
@@ -149,6 +149,7 @@ function addComponent(item) {
 
 // fix: 修复数字输入组件默认会把value设置为0，导致初始化右侧模板基本属性时没有执行value = defaultData，首次加入到画布时初始化一次
 function initInputNumber(activeData) {
+  debugger
   for (const key in activeData.confs) {
     if (activeData.confs[key].type == 'input-number') {
       activeData.confs[key].value = activeData.confs[key].defaultData
@@ -158,28 +159,30 @@ function initInputNumber(activeData) {
 }
 
 function activeFormItem(element) {
-  console.log('activeFormItem', element.componentName,element, element.confs, element.confs['min-height'], element.confs['min-height'].value)
-  debugger
   activeData.value = element
   activeId.value = element.formId
 }
 
 function cloneComponent(origin) {
-  const clone = JSON.parse(JSON.stringify(origin))
+  const clone = JSONParse(JSONStringify(origin))
   clone.formId = getUUid()
-  clone.span = formConfigRef.span
+  // clone.span = formConfigRef.span
   clone.renderKey = +new Date() // 改变renderKey后可以实现强制更新组件
 
   if (!clone.layout) {
     clone.layout = 'colFormItem'
   }
-  if (clone.layout === 'colFormItem') {
+  if (clone.layout === 'colFormItem') { // 列容器
     clone.tag !== 'h1' && clone.tag !== 'h2' && clone.tag !== 'el-button' && (clone.vModel = `field${idGlobal.value}`)
     tempActiveData = clone
-  } else if (clone.layout === 'rowFormItem') {
+  } else if (clone.layout === 'divItem') { // div容器
+    delete clone.label
+    clone.componentName = `div${idGlobal.value}`
+    tempActiveData = clone
+  } else if (clone.layout === 'rowFormItem') { // 行容器
     delete clone.label
     clone.componentName = `row${idGlobal.value}`
-    clone.gutter = formConfigRef.gutter
+    // clone.gutter = formConfigRef.gutter
     tempActiveData = clone
   }
   return clone
@@ -205,9 +208,8 @@ function generate(data) {
   func && func(data)
 }
 function AssembleFormData() {
-  console.log('drawingList:', JSON.parse(JSON.stringify(drawingList)))
   formData.value = {
-    fields: JSON.parse(JSON.stringify(drawingList)),
+    fields: JSONParse(JSONStringify(drawingList)),
     ...formConfigRef
   }
 }
@@ -231,21 +233,47 @@ function preView() {
   })
 }
 
+// 对象序列化，undefined和函数丢失问题
+const JSONStringify = (option) => {
+  return JSON.stringify(option,
+    (key, val) => {
+      // 处理函数丢失问题
+      if (typeof val === 'function') {
+        return `${val}`;
+      }
+      // 处理undefined丢失问题
+      if (typeof val === 'undefined') {
+        return 'undefined';
+      }
+      return val;
+    },
+    2
+  )
+}
+// 对象序列化解析
+const JSONParse = (objStr) => {
+  return JSON.parse(objStr, (k, v) => {
+    if (typeof v === 'string' && v.indexOf && (v.indexOf('function') > -1 || v.indexOf('=>') > -1)) {
+      // eval 可能在eslint中报错，需要加入下行注释
+      // eslint-disable-next-line
+      return eval(`(function(){return ${v}})()`);
+    }
+    return v;
+  });
+}
+
 /**
  * 保存
  */
 const saveLoading = ref(false)
 async function save() {
-  console.log('formConfSchema:', formConfSchema.value)
-  console.log('formConf:', formConfigRef)
-  console.log('drawingList:', drawingList)
   let config = {
-    formConf: formConfSchema.value,
+    formConfSchema: formConfSchemas,
     drawingConf: drawingList
   }
   let params = {
     id,
-    config: JSON.stringify(config)
+    config: JSONStringify(config)
   }
   saveLoading.value = true
   let res = await update(params);
@@ -265,17 +293,18 @@ async function getDetail() {
   let res = await getDetails(params);
   if (res.code == 200) {
     appId.value = res.data.appId
-    
-    let config = JSON.parse(res.data.config) || {
-      formConf: formConf,
+
+    let config = JSONParse(res.data.config) || {
+      formConfSchema: formConfSchemas,
       drawingConf: []
     }
 
+    formConfSchemas = reactive([])
+    config.formConfSchema.forEach(item => {
+      formConfSchemas.push(item)
+    })
 
-    for (const key in config.formConf) {
-      formConfigRef[key] = config.formConf[key]
-    }
-    // drawingList = []
+    drawingList = reactive([])
     config.drawingConf.forEach(item => {
       drawingList.push(item)
     })
@@ -301,7 +330,7 @@ function copy() {
 }
 
 function drawingItemCopy(item, parent) {
-  let clone = JSON.parse(JSON.stringify(item))
+  let clone = JSONParse(JSONStringify(item))
   clone = createIdAndKey(clone)
   parent.push(clone)
   activeFormItem(clone)
@@ -311,7 +340,7 @@ function createIdAndKey(item) {
   item.formId = getUUid()
   item.renderKey = +new Date()
   if (item.layout === 'colFormItem') {
-    if(item.tag != 'el-button') {
+    if (item.tag != 'el-button') {
       item.vModel = `field${idGlobal.value}`
     }
   } else if (item.layout === 'rowFormItem') {
@@ -401,19 +430,16 @@ onMounted(() => {
     })
   })
 
-  console.log('111:', activeId.value)
   // 初始化页面
   init()
 })
 
 
 watch(() => activeId.value, function (val) {
-  console.log('222')
   oldActiveId = val
 })
 
 watch(() => activeData.value.label, function (val, oldValue) {
-  console.log('333')
   if (
     activeData.value.placeholder === undefined
     || !activeData.value.tag
@@ -431,11 +457,13 @@ $geo-basic-footer-height: 6px;
 
 $selectedColor: #f6f7ff;
 $lighterBlue: #409EFF;
+
 .auto-form-context {
-    flex: 2;
-    box-sizing: border-box;
-    margin: 0 350px 0 260px;
+  flex: 2;
+  box-sizing: border-box;
+  margin: 0 350px 0 260px;
 }
+
 .auto-form-view {
   height: calc(100% - $geo-basic-footer-height);
   display: flex;

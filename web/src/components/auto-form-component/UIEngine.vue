@@ -1,15 +1,17 @@
 <template>
     <el-scrollbar class="center-scrollbar" :class="[mode]" :noresize="true">
-        <el-row class="center-board-row" :gutter="formConf.gutter">
-            <el-form :style="{ width: '100%' }" :model="formData" :size="formConfigRef.size" :label-position="formConfigRef.labelPosition"
-                :disabled="formConfigRef.disabled" :label-width="formConfigRef.labelWidth + 'px'">
+        <el-row class="center-board-row" :gutter="20">
+            <el-form :style="{ width: '100%' }" :model="formData" :size="formConfigRef.size"
+                :label-position="formConfigRef.labelPosition" :disabled="formConfigRef.disabled"
+                :label-width="formConfigRef.labelWidth + 'px'">
                 <draggable class="drawing-board" item-key="renderKey" :list="drawingList" :animation="340"
                     group="componentsGroup">
                     <template #item="{ element, index }">
                         <div>
-                            <draggable-item :key="element.renderKey" v-bind="attrs" :formData="formData" :element="element" :index="index" :active-id="activeId"
-                                :form-conf="formConfigRef" :drawing-list="drawingList" @activeItem="activeFormItem"
-                                @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete" @handleEvent="data => $emit('handleEvent', {formData, ...data})"/>
+                            <draggable-item :key="element.renderKey" v-bind="attrs" :formData="formData" :element="element"
+                                :index="index" :active-id="activeId" :form-conf="formConfigRef" :drawing-list="drawingList"
+                                @activeItem="activeFormItem" @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete"
+                                @handleEvent="data => $emit('handleEvent', { formData, ...data })" />
                         </div>
                     </template>
                 </draggable>
@@ -43,12 +45,22 @@ const props = defineProps({
     formData: {
         type: Object,
         default: () => { }
+    },
+    formConfSchema: {
+        type: Array,
+        default: () => []
     }
 })
-const formConf = defineModel('formConf')
-const formConfigRef = defineModel('formConfigRef')
 const drawingList = defineModel('drawingList')
 const activeId = defineModel('activeId')
+const formConfigRef = computed(() => {
+    let obj = {}
+    props.formConfSchema.forEach(item => {
+        obj[item.prop] = item.value
+    });
+    return obj
+})
+
 </script>
 
 <style lang="scss">
@@ -139,6 +151,7 @@ $lighterBlue: #409EFF;
 
         .el-form-item {
             margin-bottom: 0px;
+
             &.custom-el-button {
                 .el-form-item__label {
                     padding-right: 0;
@@ -214,6 +227,7 @@ $lighterBlue: #409EFF;
         .el-form-item {
             border: 1px dashed transparent;
         }
+
         &:hover {
             .el-form-item {
                 background: $selectedColor;
@@ -274,6 +288,7 @@ $lighterBlue: #409EFF;
     }
 
     .runtime {
+
         .drawing-item,
         .drawing-row-item {
             &:hover {
@@ -287,9 +302,11 @@ $lighterBlue: #409EFF;
                     display: none;
                 }
             }
+
             .drag-wrapper {
                 border-color: transparent;
             }
+
             .component-name {
                 display: none;
             }
