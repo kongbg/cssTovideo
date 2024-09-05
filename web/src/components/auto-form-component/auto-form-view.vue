@@ -42,12 +42,12 @@
           清空
         </el-button>
       </div>
-      <UIEngine :formConf="formConf" :formConfigRef="formConfigRef" :drawingList="drawingList" :activeId="activeId"
+      <UIEngine :formConf="formConf" :formData="formData" :formConfigRef="formConfigRef" :drawingList="drawingList" :activeId="activeId"
         :activeFormItem="activeFormItem" :drawingItemCopy="drawingItemCopy" :drawingItemDelete="drawingItemDelete">
       </UIEngine>
     </div>
     <div class="auto-form-right">
-      <auto-form-right v-model:active-data="activeData" :appId="appId" :form-conf="formConfigRef" :show-field="!!drawingList.length"
+      <auto-form-right v-model:active-data="activeData" :appId="appId" :formConfSchema="formConfSchema" :show-field="!!drawingList.length"
         @tag-change="tagChange" />
     </div>
     <code-type-dialog v-model="dialogVisible" title="选择生成类型" :show-file-name="showFileName"
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { formConf, componentsTypes } from "@/config/generator/config.js"
+import { formConf, componentsTypes, formConfSchema } from "@/config/generator/config.js"
 import { initCustomFormatter, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { Delete, DocumentCopy, Download } from "@element-plus/icons-vue";
 import draggable from 'vuedraggable'
@@ -81,7 +81,7 @@ const appId = ref('')
 let tempActiveData;
 let oldActiveId;
 
-let formConfigRef = reactive(formConf)
+let formConfSchemas = reactive(formConfSchema)
 // console.log('drawingDefault:', drawingDefault)
 // let drawingList = reactive(drawingDefault)
 // const activeData = ref(drawingDefault[0])
@@ -135,17 +135,31 @@ const execFunction = {
 function onEnd(obj, a) {
   if (obj.from !== obj.to) {
     activeData.value = tempActiveData
+    initInputNumber(activeData.value)
     activeId.value = idGlobal.value
   }
 }
 
 function addComponent(item) {
   const clone = cloneComponent(item)
+  initInputNumber(clone)
   drawingList.push(clone)
   activeFormItem(clone)
 }
 
+// fix: 修复数字输入组件默认会把value设置为0，导致初始化右侧模板基本属性时没有执行value = defaultData，首次加入到画布时初始化一次
+function initInputNumber(activeData) {
+  for (const key in activeData.confs) {
+    if (activeData.confs[key].type == 'input-number') {
+      activeData.confs[key].value = activeData.confs[key].defaultData
+    }
+  }
+  return activeData
+}
+
 function activeFormItem(element) {
+  console.log('activeFormItem', element.componentName,element, element.confs, element.confs['min-height'], element.confs['min-height'].value)
+  debugger
   activeData.value = element
   activeId.value = element.formId
 }
@@ -160,7 +174,7 @@ function cloneComponent(origin) {
     clone.layout = 'colFormItem'
   }
   if (clone.layout === 'colFormItem') {
-    clone.tag !== 'h1' && clone.tag !== 'h2' && (clone.vModel = `field${idGlobal.value}`)
+    clone.tag !== 'h1' && clone.tag !== 'h2' && clone.tag !== 'el-button' && (clone.vModel = `field${idGlobal.value}`)
     tempActiveData = clone
   } else if (clone.layout === 'rowFormItem') {
     delete clone.label
@@ -222,8 +236,11 @@ function preView() {
  */
 const saveLoading = ref(false)
 async function save() {
+  console.log('formConfSchema:', formConfSchema.value)
+  console.log('formConf:', formConfigRef)
+  console.log('drawingList:', drawingList)
   let config = {
-    formConf: formConfigRef,
+    formConf: formConfSchema.value,
     drawingConf: drawingList
   }
   let params = {
@@ -248,8 +265,7 @@ async function getDetail() {
   let res = await getDetails(params);
   if (res.code == 200) {
     appId.value = res.data.appId
-    debugger
-
+    
     let config = JSON.parse(res.data.config) || {
       formConf: formConf,
       drawingConf: []
@@ -295,7 +311,9 @@ function createIdAndKey(item) {
   item.formId = getUUid()
   item.renderKey = +new Date()
   if (item.layout === 'colFormItem') {
-    item.vModel = `field${idGlobal.value}`
+    if(item.tag != 'el-button') {
+      item.vModel = `field${idGlobal.value}`
+    }
   } else if (item.layout === 'rowFormItem') {
     item.componentName = `row${idGlobal.value}`
   }
@@ -383,16 +401,19 @@ onMounted(() => {
     })
   })
 
+  console.log('111:', activeId.value)
   // 初始化页面
   init()
 })
 
 
 watch(() => activeId.value, function (val) {
+  console.log('222')
   oldActiveId = val
 })
 
 watch(() => activeData.value.label, function (val, oldValue) {
+  console.log('333')
   if (
     activeData.value.placeholder === undefined
     || !activeData.value.tag

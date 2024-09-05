@@ -1,15 +1,15 @@
 <template>
     <el-scrollbar class="center-scrollbar" :class="[mode]" :noresize="true">
         <el-row class="center-board-row" :gutter="formConf.gutter">
-            <el-form :style="{ width: '100%' }" :size="formConfigRef.size" :label-position="formConfigRef.labelPosition"
+            <el-form :style="{ width: '100%' }" :model="formData" :size="formConfigRef.size" :label-position="formConfigRef.labelPosition"
                 :disabled="formConfigRef.disabled" :label-width="formConfigRef.labelWidth + 'px'">
                 <draggable class="drawing-board" item-key="renderKey" :list="drawingList" :animation="340"
                     group="componentsGroup">
                     <template #item="{ element, index }">
                         <div>
-                            <draggable-item :key="element.renderKey" :element="element" :index="index" :active-id="activeId"
+                            <draggable-item :key="element.renderKey" v-bind="attrs" :formData="formData" :element="element" :index="index" :active-id="activeId"
                                 :form-conf="formConfigRef" :drawing-list="drawingList" @activeItem="activeFormItem"
-                                @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete" />
+                                @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete" @handleEvent="data => $emit('handleEvent', {formData, ...data})"/>
                         </div>
                     </template>
                 </draggable>
@@ -23,10 +23,6 @@
 
 <script setup>
 import draggable from 'vuedraggable'
-const formConf = defineModel('formConf')
-const formConfigRef = defineModel('formConfigRef')
-const drawingList = defineModel('drawingList')
-const activeId = defineModel('activeId')
 const props = defineProps({
     activeFormItem: {
         type: Function,
@@ -43,8 +39,16 @@ const props = defineProps({
     mode: { // 运行模式 desgin  runtime
         type: String,
         default: 'desgin'
+    },
+    formData: {
+        type: Object,
+        default: () => { }
     }
 })
+const formConf = defineModel('formConf')
+const formConfigRef = defineModel('formConfigRef')
+const drawingList = defineModel('drawingList')
+const activeId = defineModel('activeId')
 </script>
 
 <style lang="scss">
@@ -167,10 +171,10 @@ $lighterBlue: #409EFF;
         position: relative;
         cursor: move;
         box-sizing: border-box;
-        // border: 1px dashed #ccc;
+        border: 1px dashed transparent;
         border-radius: 3px;
         // padding: 0 2px;
-        margin-bottom: 15px;
+        // margin-bottom: 15px;
 
         .drawing-row-item {
             margin-bottom: 0px;
@@ -207,6 +211,9 @@ $lighterBlue: #409EFF;
 
     .drawing-item,
     .drawing-row-item {
+        .el-form-item {
+            border: 1px dashed transparent;
+        }
         &:hover {
             .el-form-item {
                 background: $selectedColor;

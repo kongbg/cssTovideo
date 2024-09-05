@@ -1,18 +1,15 @@
 <template>
-  <component :is="props.conf.tag" v-bind="cloneConf"  v-model="valueVal" >
+  <component :is="props.conf.tag" v-bind="cloneConf"  v-model="formData[conf.vModel]" >
       <template #default>
-        <!-- el-button 类型， 若非el-button 类型 不能实现则需要继续扩展-->
-        <template v-if="props.conf.tag == 'el-button'">{{ props.conf['btn-text'] }}</template>
-        <!-- 非el-button 类型-->
-        <template v-else v-for="(item, childKey) in form.componentChild[props.conf?.tag]">
-          <Childer  v-if="props.conf[childKey]"  :tag="props.conf.tag" :conf="props.conf" :child-key="childKey" />
+        <template v-for="(item, childKey) in form.componentChild[props.conf?.tag]">
+          <Childer  v-if="props.conf[childKey] || childKey == 'default'"  :tag="props.conf.tag" :conf="props.conf" :child-key="childKey" />
         </template>
       </template>
   </component>
 </template>
 
 <script setup>
-import {defineComponent, defineProps, h, ref, watch, watchEffect} from 'vue';
+import {computed, defineComponent, defineProps, h, ref, watch, watchEffect} from 'vue';
 import MobileLayerAutoForm from './mobileLayerAutoForm';
 
 const props = defineProps({
@@ -20,25 +17,36 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  formData: {
+    type: Object,
+    default: ()=>{}
+  }
 });
 
 const form = new MobileLayerAutoForm();
-const valueVal = ref(props.conf.defaultValue)
-const cloneConf = ref(props.conf)
+// const cloneConf = ref(props.conf)
+const cloneConf = computed(()=>{
+  let obj = {}
+  for (const key in props.conf.confs) {
+    obj[key] = props.conf.confs[key].value
+  }
+  return obj
+})
+
+if (props.formData) {
+  props.formData[props.conf.vModel] = props.conf.defaultValue
+}
 
 watch(props.conf,(value) => {
     console.debug("数据变化", value)
-    cloneConf.value = {...props.conf}
-    valueVal.value = props.conf.defaultValue
+    // cloneConf.value = {...props.conf}
+    if (props.formData) {
+      props.formData[props.conf.vModel] = props.conf.defaultValue
+    }
     // checkbox 中tag 不能替换为此处tag的含义
     delete cloneConf.value.tag
     delete cloneConf.value.defaultValue
 },{deep: true, immediate:true})
-
-watch(valueVal,(value)=>{
-  props.conf.defaultValue = value
-})
-
 
 /*
 const children = ref([])
@@ -70,8 +78,7 @@ const Childer = defineComponent({
     }
   },
   setup(props,{attrs}) {
-    console.log('props:', props)
-    debugger
+    console.log('props', props)
     return () => h('div', null , [form.componentChild[props.tag][props.childKey]?.(h, props.conf, props.childKey)]);
   },
 });

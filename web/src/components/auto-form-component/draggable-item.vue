@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, h, markRaw, resolveComponent } from 'vue'
+import { defineComponent, h, markRaw, resolveComponent, getCurrentInstance } from 'vue'
 import { Delete, Document } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
 
@@ -26,14 +26,16 @@ const components = {
   }
 }
 const layouts = {
-  colFormItem(h, element, index, parent, attrs) {
-    const { onActiveItem } = attrs
+  colFormItem(h, element, index, parent, attrs, formData) {
+    const { proxy } = getCurrentInstance();
+    const { onActiveItem, pageData } = attrs
     let className = this.activeId === element.formId ? 'drawing-item active-from-item' : 'drawing-item'
     if (this.formConf.unFocusedComponentBorder) className += ' unfocus-bordered'
-    console.log('elementelement:',element)
     return h(
       resolveComponent('el-col'), {
-      span: element.span, class: className, onClick: (event) => {
+      span: element.confs.span.value,
+      class: className,
+      onClick: (event) => {
         onActiveItem && onActiveItem(element);
         event.stopPropagation()
       }
@@ -54,7 +56,18 @@ const layouts = {
                   h(resolveComponent('auto-form-render'), {
                     key: element.renderKey,
                     conf: element,
-                    onClick: (event) => event.stopPropagation()
+                    formData: formData,
+                    onClick: (event) => {
+                      if (element.eventId) {
+                        let FnObj = element.events.find(item => item.value == element.eventId)
+                        if(FnObj) {
+                          console.log(FnObj.value)
+                          let action = FnObj.value
+                          proxy.$emit('handleEvent', {action, element})
+                        }
+                      }
+                      event.stopPropagation()
+                    }
                   }),
                   components.itemBtns.apply(this, arguments)
                 ]
@@ -63,7 +76,6 @@ const layouts = {
           )
         ]
       })
-    
   },
   rowFormItem(h, element, index, parent, attrs) {
     const { onActiveItem } = attrs
@@ -71,14 +83,15 @@ const layouts = {
     const _this = this
 
     return h(resolveComponent('el-col'), {
-      span: element.span,
+      span: element.confs.span.value || 24,
     }, {
       default: () => [
         h(resolveComponent('el-row'), {
           gutter: element.gutter,
           class: className,
+          style: getDrawingRowItem(element),
           onClick: (event) => {
-            onActiveItem(element);
+            onActiveItem && onActiveItem(element);
             event.stopPropagation();
           },
         }, {
@@ -93,7 +106,8 @@ const layouts = {
               itemKey: `${element.renderKey}`,
               tag: element.type === 'flex' ? 'el-row' : 'span',
               justify: element.justify,
-              align: element.align
+              align: element.align,
+              style: dragWrapperStyle(element)
             }, {
               item: (itemData) => {
                 const el = itemData.element
@@ -138,16 +152,17 @@ export default defineComponent({
     },
     drawingList: {
       type: Array
+    },
+    formData: {
+      type: Object,
+      default: () => {}
     }
   },
   setup(props, { attrs }) {
-
-
     const layout = layouts[props.element.layout]
     console.log('props.element', props.element, props.index)
-    debugger
     if (layout) {
-      return () => layout.call(props, h, props.element, props.index, props.drawingList, attrs)
+      return () => layout.call(props, h, props.element, props.index, props.drawingList, attrs, props.formData)
     }
     return () => layoutIsNotFound(this)
   },
@@ -155,6 +170,30 @@ export default defineComponent({
 
 })
 
+function getDrawingRowItem(params) {
+  let confs = params.confs || {}
+  let obj = {}
+  for (const key in confs) {
+    let info = confs[key]
+    // console.log(key, info)
+    // 带单位属性
+    let hasUnit = ['padding', 'margin']
+    if (info.style) {
+      if (!hasUnit.includes(key)) {
+        obj[key] = `${info.value}${info.unit}`
+      } else {
+        obj[key] = `${info.value}`
+      }
+    }
+  }
+  return obj
+}
+function dragWrapperStyle(params) {
+  let confs = params.confs || {}
+  let obj = {}
+  
+  return obj
+}
 
 const rowFromItemComponent = defineComponent({
   props: {},

@@ -83,34 +83,118 @@ export default class commonController {
    * 通过pageId modeId 获取数据
    */
   static async getDataByModeId(ctx) {
-    let { pageId, modeId, id, type } = ctx.request.body;
-    const query = {
-      id: modeId,
-      page: 1,
-      pageSize: 1
-    }
-
-    let [err, res] = await mode.getData(query)
-    if (!err) {
-      let tableName = res.data.tableName;
+    let { pageId, modeId, id, type, page, pageSize } = ctx.request.query;
+    // 获取表名
+    let tableName = await getTableName(modeId)
+    if (tableName) {
       const newMode = new Mode(tableName, db)
-      if(type == 'from') {
+      if(type == 'form') {
         const query = {
+          id,
           page: 1,
           pageSize: 1
         }
-    
+
         let [err, res] = await newMode.getData(query)
         let { data=[], total=0, totalPages=0 } = res || {};
-    
+
         let result = {
           code: !err ? 200 : 400,
           data: data.length ? data[0] : null,
           msg: !err ? 'ok' : (err.msg || err.code)
         }
         ctx.body = result
+      } else {
+        const query = {
+          id,
+          page,
+          pageSize,
+        }
+
+        let [err, res] = await newMode.getData(query)
+        let { data=[], total=0, totalPages=0 } = res || {};
+
+        let result = {
+          code: !err ? 200 : 400,
+          data: data.length ? data : [],
+          msg: !err ? 'ok' : (err.msg || err.code)
+        }
+        ctx.body = result
       }
 
+    } else {
+      ctx.body = {
+        code: 400,
+        data: null,
+        msg: '获取表名失败'
+      }
     }
   }
+  /**
+   * 通过pageId modeId 提交数据
+   */
+  static async createByModeId(ctx) {
+    let { pageId, modeId, id, formData } = ctx.request.body;
+
+    // 获取表名
+    let tableName = await getTableName(modeId)
+    if (tableName) {
+      // 通过表名创建数据库实例
+      const newMode = new Mode(tableName, db)
+      let [err, res] = await newMode.create(formData)
+
+      ctx.body = {
+        code: !err ? 200 : 400,
+        data: res,
+        msg: !err ? 'ok' : (err.msg || err.code)
+      }
+    } else {
+      ctx.body = {
+        code: 400,
+        data: null,
+        msg: '获取表名失败'
+      }
+    }
+  }
+  /**
+   * 通过pageId modeId 更新数据
+   */
+  static async updateByModeId(ctx) {
+    let { pageId, modeId, id, formData } = ctx.request.body;
+
+    // 获取表名
+    let tableName = await getTableName(modeId)
+    if (tableName) {
+      // 通过表名创建数据库实例
+      const newMode = new Mode(tableName, db)
+      let [err, res] = await newMode.update(formData)
+
+      ctx.body = {
+        code: !err ? 200 : 400,
+        data: res,
+        msg: !err ? 'ok' : (err.msg || err.code)
+      }
+    } else {
+      ctx.body = {
+        code: 400,
+        data: null,
+        msg: '获取表名失败'
+      }
+    }
+  }
+}
+
+// 获取表名
+async function getTableName(modeId) {
+  let tableName = ''
+  const query = {
+    id: modeId,
+    page: 1,
+    pageSize: 1
+  }
+  let [err, res] = await mode.getData(query)
+  if (!err && res.data.length) {
+    tableName = res.data[0].tableName;
+  }
+  return tableName;
 }

@@ -1,15 +1,13 @@
 import {resolveComponent} from "vue";
 
 class MobileLayerAutoForm {
-    constructor(options = {}, showMessage = false, successMsg = '操作成功', errorMsg = '操作失败') {
-        
-    }
+    constructor(options = {}, showMessage = false, successMsg = '操作成功', errorMsg = '操作失败') {}
 
     componentChild = {
         'el-button': {
             default(h, conf, key) {
-                return conf[key]
-            },
+                return conf.confs['btn-text'].value || '按钮'
+            }
         },
         'el-input': {
             prepend(h, conf, key) {
