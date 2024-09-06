@@ -1,5 +1,5 @@
 <template>
-    <div class="cards-warp">
+    <div class="cards-wrap">
         <div class="cards" v-for="(item, index) in data" @click="$emit('handleClick', { data: item, index })">
             <div class="icon"></div>
             <div class="name">{{ item.name }}</div>
@@ -16,7 +16,7 @@ const data = defineModel('data')
 </script>
 
 <style lang="scss" scoped>
-.cards-warp {
+.cards-wrap {
     display: flex;
 
     .cards {

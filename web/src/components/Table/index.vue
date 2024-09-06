@@ -1,7 +1,10 @@
 <template>
     <div class="table-container">
-        <el-table v-bind="tableProps" v-loading="tableProps.loading" :data="tableData" style="width: 100%">
-            <el-table-column v-bind="getColumnProps(column)" v-for="column in columns" :key="column.prop">
+        <div v-if="!columns.length" class="no-configs">
+            <div>表格: 请绑定模型并配置列表字段</div>
+        </div>
+        <el-table v-bind="tableProps" v-if="columns.length" v-loading="tableProps.loading" :data="tableData" style="width: 100%">
+            <el-table-column  v-bind="getColumnProps(column)" v-for="column in columns" :key="column.prop">
                 <!-- headSlot -->
                 <template v-slot="scope" v-if="column.headSlot" #header>
                     <slot :name="column.headSlot"></slot>

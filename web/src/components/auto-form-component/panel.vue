@@ -1,5 +1,5 @@
 <template>
-    <div class="panel-warp">
+    <div class="panel-wrap">
         <el-form size="small" label-width="90px">
             <!-- 组件名称 -->
             <el-form-item v-if="activeData && activeData.componentName" label="组件名称">

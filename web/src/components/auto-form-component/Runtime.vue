@@ -17,9 +17,39 @@ import { getDataByModeId, createByModeId, updateByModeId } from '@/api/common.js
 const route = useRoute()
 const { pageId } = route.params
 const { id, action='create' } = route.query
-const formConfSchemas = reactive(formConfSchema)
+let formConfSchemas = reactive(formConfSchema)
 let drawingList = reactive([])
 const formData = ref({})
+
+// 对象序列化，undefined和函数丢失问题
+const JSONStringify = (option) => {
+  return JSON.stringify(option,
+    (key, val) => {
+      // 处理函数丢失问题
+      if (typeof val === 'function') {
+        return `${val}`;
+      }
+      // 处理undefined丢失问题
+      if (typeof val === 'undefined') {
+        return 'undefined';
+      }
+      return val;
+    },
+    2
+  )
+}
+// 对象序列化解析
+const JSONParse = (objStr) => {
+  return JSON.parse(objStr, (k, v) => {
+    if (typeof v === 'string' && v.indexOf && (v.indexOf('function') > -1 || v.indexOf('=>') > -1)) {
+      // eval 可能在eslint中报错，需要加入下行注释
+      // eslint-disable-next-line
+      return eval(`(function(){return ${v}})()`);
+    }
+    return v;
+  });
+}
+
 
 /**
  * 获取页面配置
@@ -33,9 +63,10 @@ async function getDetail() {
       drawingConf: []
     }
 
-    for (const key in config.formConf) {
-      formConfSchemas[key] = config.formConf[key]
-    }
+    formConfSchemas = reactive([])
+    config.formConfSchema.forEach(item => {
+      formConfSchemas.push(item)
+    })
 
     config.drawingConf.forEach(item => {
       if (['view'].includes(action)) {
@@ -99,7 +130,7 @@ async function submit(element, formData) {
 }
 
 async function init() {
-  // await getDetail()
+  await getDetail()
   if (['edit', 'view'].includes(action)) {
     getPageData()
   }

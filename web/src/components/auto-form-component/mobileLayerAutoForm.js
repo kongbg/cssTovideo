@@ -9,6 +9,16 @@ class MobileLayerAutoForm {
                 return conf.confs['btn-text'].value || '按钮'
             }
         },
+        't-table': {
+            default(h, conf, key) {
+                return 't-table'
+            }
+        },
+        't-search': {
+            default(h, conf, key) {
+                return 't-search'
+            }
+        },
         'el-input': {
             prepend(h, conf, key) {
                 return h('div', null, {prepend: () => conf[key]})

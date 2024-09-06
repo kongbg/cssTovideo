@@ -1,6 +1,9 @@
 <template>
   <div class="search-container">
     <el-form class="search-form" v-model="searchForm" v-bind="formProps">
+      <div v-if="!configs.length" class="no-configs">
+        <div>搜索组件: 请绑定模型并配置搜索条件</div>
+      </div>
       <template v-for="(rows, index) in configs">
         <el-row :gutter="gutter">
           <el-col :span="6" v-for="info in rows">
@@ -153,7 +156,7 @@ function initConfig() {
   }
 
   // 判断最后一行是否能放下搜索按钮，放不下另起一行
-  let lastRow = configs.value[configs.value.length - 1]
+  let lastRow = configs.value.length ? configs.value[configs.value.length - 1] : []
   let num = 0
   if (lastRow.length <= props.col - 1) {
     num = props.col - 1 - lastRow.length

@@ -42,7 +42,7 @@
           清空
         </el-button>
       </div>
-      <UIEngine :formData="formData" :formConfSchema="formConfSchemas" :drawingList="drawingList" :activeId="activeId"
+      <UIEngine :formData="formData" :formConfSchema="formConfSchemas" :drawingList="drawingList" mode="desgin" :activeId="activeId"
         :activeFormItem="activeFormItem" :drawingItemCopy="drawingItemCopy" :drawingItemDelete="drawingItemDelete">
       </UIEngine>
     </div>
@@ -149,13 +149,14 @@ function addComponent(item) {
 
 // fix: 修复数字输入组件默认会把value设置为0，导致初始化右侧模板基本属性时没有执行value = defaultData，首次加入到画布时初始化一次
 function initInputNumber(activeData) {
-  debugger
-  for (const key in activeData.confs) {
-    if (activeData.confs[key].type == 'input-number') {
-      activeData.confs[key].value = activeData.confs[key].defaultData
+  if (activeData && activeData.confs) {
+    for (const key in activeData.confs) {
+      if (activeData.confs[key].type == 'input-number') {
+        activeData.confs[key].value = activeData.confs[key].defaultData
+      }
     }
+    return activeData
   }
-  return activeData
 }
 
 function activeFormItem(element) {
@@ -175,14 +176,14 @@ function cloneComponent(origin) {
   if (clone.layout === 'colFormItem') { // 列容器
     clone.tag !== 'h1' && clone.tag !== 'h2' && clone.tag !== 'el-button' && (clone.vModel = `field${idGlobal.value}`)
     tempActiveData = clone
-  } else if (clone.layout === 'divItem') { // div容器
-    delete clone.label
-    clone.componentName = `div${idGlobal.value}`
-    tempActiveData = clone
   } else if (clone.layout === 'rowFormItem') { // 行容器
     delete clone.label
     clone.componentName = `row${idGlobal.value}`
     // clone.gutter = formConfigRef.gutter
+    tempActiveData = clone
+  } else { // div容器
+    delete clone.label
+    clone.componentName = `div${idGlobal.value}`
     tempActiveData = clone
   }
   return clone

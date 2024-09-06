@@ -2,6 +2,7 @@
   <component :is="props.conf.tag" v-bind="cloneConf"  v-model="formData[conf.vModel]" >
       <template #default>
         <template v-for="(item, childKey) in form.componentChild[props.conf?.tag]">
+          {{ childKey }}
           <Childer  v-if="props.conf[childKey] || childKey == 'default'"  :tag="props.conf.tag" :conf="props.conf" :child-key="childKey" />
         </template>
       </template>
@@ -29,6 +30,10 @@ const cloneConf = computed(()=>{
   let obj = {}
   for (const key in props.conf.confs) {
     obj[key] = props.conf.confs[key].value
+  }
+
+  if (props.conf.data) {
+    obj.data = props.conf.data
   }
   return obj
 })

@@ -1,25 +1,26 @@
 <template>
     <el-scrollbar class="center-scrollbar" :class="[mode]" :noresize="true">
-        <el-row class="center-board-row" :gutter="20">
-            <el-form :style="{ width: '100%' }" :model="formData" :size="formConfigRef.size"
+        <div class="center-board-row">
+            <div :style="{ width: '100%' }" :model="formData" :size="formConfigRef.size"
                 :label-position="formConfigRef.labelPosition" :disabled="formConfigRef.disabled"
                 :label-width="formConfigRef.labelWidth + 'px'">
                 <draggable class="drawing-board" item-key="renderKey" :list="drawingList" :animation="340"
                     group="componentsGroup">
                     <template #item="{ element, index }">
-                        <div>
+                        <div class="drawing-board-item" :class="[`${element.tag}-board`]">
                             <draggable-item :key="element.renderKey" v-bind="attrs" :formData="formData" :element="element"
                                 :index="index" :active-id="activeId" :form-conf="formConfigRef" :drawing-list="drawingList"
+                                :mode="mode"
                                 @activeItem="activeFormItem" @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete"
                                 @handleEvent="data => $emit('handleEvent', { formData, ...data })" />
                         </div>
                     </template>
                 </draggable>
-            </el-form>
+            </div>
             <div v-show="!drawingList.length && mode == 'desgin'" class="empty-info">
                 <el-empty :image-size="200" :description="'从左侧拖入或点选组件进行表单设计'" />
             </div>
-        </el-row>
+        </div>
     </el-scrollbar>
 </template>
 
@@ -94,7 +95,7 @@ $lighterBlue: #409EFF;
     }
 
     .center-board-row {
-        padding: 10px 10px 15px 10px;
+        // padding: 10px 10px 15px 10px;
         box-sizing: border-box;
         height: 100%;
         position: relative;
@@ -103,6 +104,10 @@ $lighterBlue: #409EFF;
     .drawing-board {
         height: calc(100% - 30px * 2);
         padding: 30px 0;
+
+        // .drawing-board-item.el-button-board {
+        //     display: inline-block;
+        // }
 
         .components-body {
             padding: 0;
@@ -167,6 +172,73 @@ $lighterBlue: #409EFF;
         top: 5px;
     }
 
+    .div-wrap,
+    .el-row-wrap,
+    .el-col-wrap,
+    .div-item,
+    .t-search {
+        position: relative;
+        cursor: move;
+        border: 1px dashed #ccc;
+        width: 100%;
+        // min-height: 80px;
+        box-sizing: border-box;
+
+        &.active {
+            border: 1px dashed $lighterBlue;
+
+            .drawing-item-copy,
+            .drawing-item-delete {
+                display: block;
+            }
+
+            .component-name {
+                color: $lighterBlue;
+            }
+        }
+    }
+    .t-table-wrap {
+        border: 1px dashed #ccc;
+        &.active {
+            border: 1px dashed $lighterBlue;
+        }
+    }
+    .t-table {
+        position: relative;
+        cursor: move;
+        // border: 1px dashed #ccc;
+        width: 100%;
+        max-width: 100%;
+        // min-height: 80px;
+        box-sizing: border-box;
+
+        &.active {
+            // border: 1px dashed $lighterBlue;
+
+            .drawing-item-copy,
+            .drawing-item-delete {
+                display: block;
+            }
+
+            .component-name {
+                color: $lighterBlue;
+            }
+        }
+    }
+    .el-button-board {
+        .div-item {
+            min-height: 32px;
+            width: auto;
+            display: inline-block;
+            .drawing-item-copy {
+                right: 28px;
+            }
+            .drawing-item-delete {
+                right: 0;
+            }
+        }
+    }
+
     .drawing-item {
         position: relative;
         cursor: move;
@@ -203,7 +275,7 @@ $lighterBlue: #409EFF;
 
         .drag-wrapper {
             width: 100%;
-            min-height: 80px;
+            // min-height: 80px;
             border: 1px dashed #ccc;
         }
 
@@ -211,17 +283,19 @@ $lighterBlue: #409EFF;
             border: 1px dashed $lighterBlue;
         }
 
-        .component-name {
-            position: absolute;
-            top: 0;
-            left: 0;
-            font-size: 12px;
-            color: #bbb;
-            display: inline-block;
-            padding: 0 6px;
-        }
+        
     }
 
+    .component-name {
+        // position: absolute;
+        // top: 0;
+        // left: 0;
+        font-size: 12px;
+        color: #bbb;
+        display: inline-block;
+        padding: 0 6px;
+        height: 16px;
+    }
     .drawing-item,
     .drawing-row-item {
         .el-form-item {
@@ -284,6 +358,46 @@ $lighterBlue: #409EFF;
                 background: #F56C6C;
                 color: #fff;
             }
+        }
+    }
+
+    .drawing-item-copy,
+    .drawing-item-delete {
+        display: none;
+        position: absolute;
+        top: -10px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+        text-align: center;
+        border-radius: 50%;
+        font-size: 12px;
+        border: 1px solid;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .drawing-item-copy {
+        right: 56px;
+        border-color: $lighterBlue;
+        color: $lighterBlue;
+        background: #fff;
+
+        &:hover {
+            background: $lighterBlue;
+            color: #fff;
+        }
+    }
+
+    .drawing-item-delete {
+        right: 24px;
+        border-color: #F56C6C;
+        color: #F56C6C;
+        background: #fff;
+
+        &:hover {
+            background: #F56C6C;
+            color: #fff;
         }
     }
 

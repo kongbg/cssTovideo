@@ -46,7 +46,6 @@ watch(()=>props.modelValue, () => {
 
 function change() {
     let str = `${paddingTop.value}${props.unit} ${paddingRight.value}${props.unit} ${paddingBottom.value}${props.unit} ${paddingLeft.value}${props.unit}`;
-    console.log('str:', str)
     emit('update:modelValue', str)
 }
 

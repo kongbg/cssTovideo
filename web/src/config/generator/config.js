@@ -580,18 +580,19 @@ export const selectComponents = [
 
 export const layoutComponents = [
     {
-        layout: 'rowFormItem',
-        tagIcon: 'row',
-        type: 'flex',
-        justify: 'start',
-        align: 'top',
-        label: '行容器',
-        layoutTree: true,
-        children: [],
-        confs: {
+        layout: 'divWrap',// 渲染方式
+        tag: 'div', // 渲染标签
+        tagType: 'wrap',
+        label: '普通容器', // 组件名称
+        type: 'flex', // 可以拖入子元素
+        justify: 'start', // 横向排列，这个可以提取到可编辑属性中
+        align: 'top',// ？，这个可以提取到可编辑属性中
+        layoutTree: true,// 布局树
+        children: [],// 子元素
+        confs: { // 可编辑属性
             span: {
                 type: 'slider',
-                label: '表单栅格',
+                label: '栅格',
                 prop: 'span',
                 value: '',
                 defaultData: 24,
@@ -629,7 +630,137 @@ export const layoutComponents = [
                 label: '内边距',
                 prop: 'padding',
                 value: '',
-                defaultData: '10px 10px 10px 10px',
+                defaultData: '0px 0px 0px 0px',
+                style: true,
+                unit: 'px'
+            },
+            'margin': {
+                type: 'margin-padding',
+                label: '外边距',
+                prop: 'margin',
+                value: '',
+                defaultData: '0px 0px 0px 0px',
+                style: true,
+                unit: 'px'
+            }
+        }
+    },
+    {
+        layout: 'rowWrap',
+        tagIcon: 'row',
+        type: 'flex',
+        justify: 'start',
+        align: 'top',
+        label: '行容器',
+        layoutTree: true,
+        children: [],
+        confs: {
+            span: {
+                type: 'slider',
+                label: '栅格',
+                prop: 'span',
+                value: '',
+                defaultData: 24,
+                max: 24,
+                min: 0
+            },
+            // gutter: {
+            //     type: 'input-number',
+            //     label: '栅格间隔',
+            //     prop: 'gutter',
+            //     value: 0,
+            //     defaultData: 0,
+            //     unit: 'px'
+            // },
+            // height: {
+            //     type: 'input-number',
+            //     label: '高度',
+            //     prop: 'height',
+            //     value: '',
+            //     defaultData: 80,
+            //     style: true,
+            //     unit: 'px'
+            // },
+            'min-height': {
+                type: 'input-number',
+                label: '最小高度',
+                prop: 'min-height',
+                value: '',
+                defaultData: 80,
+                style: true,
+                unit: 'px'
+            },
+            'padding': {
+                type: 'margin-padding',
+                label: '内边距',
+                prop: 'padding',
+                value: '',
+                defaultData: '0px 0px 0px 0px',
+                style: true,
+                unit: 'px'
+            },
+            'margin': {
+                type: 'margin-padding',
+                label: '外边距',
+                prop: 'margin',
+                value: '',
+                defaultData: '0px 0px 0px 0px',
+                style: true,
+                unit: 'px'
+            }
+        }
+    },
+    {
+        layout: 'colWrap',
+        tagIcon: 'row',
+        type: 'flex',
+        justify: 'start',
+        align: 'top',
+        label: '列容器',
+        layoutTree: true,
+        children: [],
+        confs: {
+            span: {
+                type: 'slider',
+                label: '栅格',
+                prop: 'span',
+                value: '',
+                defaultData: 24,
+                max: 24,
+                min: 0
+            },
+            // gutter: {
+            //     type: 'input-number',
+            //     label: '栅格间隔',
+            //     prop: 'gutter',
+            //     value: 0,
+            //     defaultData: 0,
+            //     unit: 'px'
+            // },
+            // height: {
+            //     type: 'input-number',
+            //     label: '高度',
+            //     prop: 'height',
+            //     value: '',
+            //     defaultData: 80,
+            //     style: true,
+            //     unit: 'px'
+            // },
+            'min-height': {
+                type: 'input-number',
+                label: '最小高度',
+                prop: 'min-height',
+                value: '',
+                defaultData: 80,
+                style: true,
+                unit: 'px'
+            },
+            'padding': {
+                type: 'margin-padding',
+                label: '内边距',
+                prop: 'padding',
+                value: '',
+                defaultData: '0px 0px 0px 0px',
                 style: true,
                 unit: 'px'
             },
@@ -760,7 +891,53 @@ export const actionComponents = [
     }
 ]
 
+export const dataComponents = [
+    {
+        label: '搜索组件',
+        tag: 't-search',
+        layout: 't-search',
+        confs: {
+            span: {
+                type: 'slider',
+                label: '栅格',
+                prop: 'span',
+                value: '',
+                defaultData: 24,
+                max: 24,
+                min: 0
+            },
+        }
+    },
+    {
+        label: '表格',
+        tag: 't-table',
+        layout: 't-table',
+        data: [{date: "123"}],
+        confs: {
+            span: {
+                type: 'slider',
+                label: '栅格',
+                prop: 'span',
+                value: '',
+                defaultData: 24,
+                max: 24,
+                min: 0
+            },
+        }
+    }
+]
+
 export const componentsTypes = [
+    {
+        typeName: '布局型组件',
+        svgIconName: 'component',
+        typeList: layoutComponents
+    },
+    {
+        typeName: '数据展示组件',
+        svgIconName: 'component',
+        typeList: dataComponents
+    },
     // {
     //     typeName: "标注型组件",
     //     svgIconName: 'component',
@@ -775,11 +952,6 @@ export const componentsTypes = [
         typeName: '选择型组件',
         svgIconName: 'component',
         typeList: selectComponents
-    },
-    {
-        typeName: '布局型组件',
-        svgIconName: 'component',
-        typeList: layoutComponents
     },
     {
         typeName: '操作型组件',

@@ -2,7 +2,8 @@
 import { defineComponent, h, markRaw, resolveComponent, getCurrentInstance } from 'vue'
 import { Delete, Document } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
-
+import Table from '@/components/Table/index.vue'
+import Tsearch from '@/components/SearchForm/index.vue'
 const components = {
   itemBtns(h, element, index, parent, attrs) {
     const { onCopyItem, onDeleteItem } = attrs
@@ -26,7 +27,7 @@ const components = {
   }
 }
 const layouts = {
-  colFormItem(h, element, index, parent, attrs, formData) {
+  colFormItem(h, element, index, parent, attrs, formData, mode) {
     const { proxy } = getCurrentInstance();
     const { onActiveItem, pageData } = attrs
     let className = this.activeId === element.formId ? 'drawing-item active-from-item' : 'drawing-item'
@@ -51,11 +52,11 @@ const layouts = {
             },
             {
               default: () => {
-                console.log('auto-form-render:', element.tag)
                 return [
                   h(resolveComponent('auto-form-render'), {
                     key: element.renderKey,
                     conf: element,
+                    mode: mode,
                     formData: formData,
                     onClick: (event) => {
                       if (element.eventId) {
@@ -77,7 +78,7 @@ const layouts = {
         ]
       })
   },
-  rowFormItem(h, element, index, parent, attrs) {
+  rowFormItem(h, element, index, parent, attrs, formData, mode) {
     const { onActiveItem } = attrs
     const className = this.activeId === element.formId ? 'drawing-row-item active-from-item' : 'drawing-row-item'
     const _this = this
@@ -97,7 +98,7 @@ const layouts = {
         }, {
           // TODO: 替换默认实现 tag node_modules/vuedraggable/src/core/renderHelper.js getRootInformation
           default: () => [
-            h('span', { class: 'component-name' }, [element.componentName]),
+            // h('span', { class: 'component-name' }, [element.componentName]),
             h(markRaw(draggable), {
               list: element.children,
               animation: 340,
@@ -130,21 +131,249 @@ const layouts = {
     );
 
   },
-  divItem(h, element, index, parent, attrs) {
+  divItem(h, element, index, parent, attrs, formData, mode) {
     const { onActiveItem } = attrs
-    const className = this.activeId === element.formId ? 'div-item active-div-item' : 'div-item'
+    const className = this.activeId === element.formId ? 'div-item active hhhhhh' : 'div-item'
     const _this = this
 
     return h(resolveComponent('div'), {
-      class: className
+      class: className,
+      style: getDrawingRowItem(element),
+      onClick: (event) => {
+        onActiveItem && onActiveItem(element);
+        event.stopPropagation()
+      }
     }, {
       default: () => [
-        h(resolveComponent('el-button'),
-          {
-
-          }),
+        h(resolveComponent('auto-form-render'), {
+          key: element.renderKey,
+          conf: element,
+          mode: mode,
+          formData: {},
+          onClick: (event) => {
+            if (mode == 'runtime') {
+              if (element.eventId) {
+                let FnObj = element.events.find(item => item.value == element.eventId)
+                if (FnObj) {
+                  console.log(FnObj.value)
+                  let action = FnObj.value
+                  proxy.$emit('handleEvent', { action, element })
+                }
+              }
+              event.stopPropagation()
+            }
+          }
+        }),
         components.itemBtns.apply(this, arguments)
       ]
+
+    })
+  },
+  divWrap(h, element, index, parent, attrs, formData, modes) {
+    const { onActiveItem } = attrs
+    let className = `${element.tag}-${element.tagType}`
+    className = this.activeId === element.formId ? `${className} active` : className
+    const _this = this
+    const tag = element.tag || 'div'
+
+    let tagProps = {
+      class: className,
+      style: getDrawingRowItem(element),
+      onClick: (event) => {
+        onActiveItem && onActiveItem(element);
+        event.stopPropagation();
+      },
+    }
+
+    if (element.tag == 'el-row' || element.tag == 'el-col') {
+      tagProps.span = element.confs.span.value || 24
+      tagProps.ustify = element.justify
+      tagProps.align = element.align
+    }
+
+    return h(resolveComponent(tag), tagProps, {
+      default: () => [
+        // h('span', { class: 'component-name' }, [element.componentName]),
+        h(markRaw(draggable), {
+          list: element.children,
+          animation: 340,
+          group: "componentsGroup",
+          class: "drag-wrapper",
+          itemKey: `${element.renderKey}`,
+          tag: element.type === 'flex' ? 'el-row' : 'span',
+          justify: element.justify,
+          align: element.align,
+          style: dragWrapperStyle(element)
+        }, {
+          item: (itemData) => {
+            const el = itemData.element
+            const ix = itemData.index
+            const layout = layouts[el.layout]
+            if (layout) {
+              let child = layout.call(_this, h, el, ix, element.children, attrs)
+              return [child]
+            } else {
+              return null;
+            }
+          }
+        }),
+        components.itemBtns.apply(this, arguments)
+      ]
+    })
+  },
+  rowWrap(h, element, index, parent, attrs, formData, mode) {
+    const { onActiveItem } = attrs
+    const className = this.activeId === element.formId ? 'drawing-row-item active-from-item' : 'drawing-row-item'
+    const _this = this
+
+    return h(resolveComponent('el-col'), {
+      span: element.confs.span.value || 24,
+    }, {
+      default: () => [
+        h(resolveComponent('el-row'), {
+          gutter: element.gutter,
+          class: className,
+          style: getDrawingRowItem(element),
+          onClick: (event) => {
+            onActiveItem && onActiveItem(element);
+            event.stopPropagation();
+          },
+        }, {
+          // TODO: 替换默认实现 tag node_modules/vuedraggable/src/core/renderHelper.js getRootInformation
+          default: () => [
+            // h('span', { class: 'component-name' }, [element.componentName]),
+            h(markRaw(draggable), {
+              list: element.children,
+              animation: 340,
+              group: "componentsGroup",
+              class: "drag-wrapper",
+              itemKey: `${element.renderKey}`,
+              tag: element.type === 'flex' ? 'el-row' : 'span',
+              justify: element.justify,
+              align: element.align,
+              style: dragWrapperStyle(element)
+            }, {
+              item: (itemData) => {
+                const el = itemData.element
+                const ix = itemData.index
+                const layout = layouts[el.layout]
+                if (layout) {
+                  let child = layout.call(_this, h, el, ix, element.children, attrs)
+                  return [child]
+                } else {
+                  return null;
+                }
+              }
+            })
+            ,
+            components.itemBtns.apply(this, arguments)
+          ]
+        }),
+      ]
+    }
+    );
+
+  },
+  colWrap(h, element, index, parent, attrs, formData, mode) {
+    const { onActiveItem } = attrs
+    const className = this.activeId === element.formId ? 'drawing-row-item active-from-item' : 'drawing-row-item'
+    const _this = this
+
+    return h(resolveComponent('el-col'), {
+      span: element.confs.span.value || 24,
+    }, {
+      default: () => [
+        h(resolveComponent('el-row'), {
+          gutter: element.gutter,
+          class: className,
+          style: getDrawingRowItem(element),
+          onClick: (event) => {
+            onActiveItem && onActiveItem(element);
+            event.stopPropagation();
+          },
+        }, {
+          // TODO: 替换默认实现 tag node_modules/vuedraggable/src/core/renderHelper.js getRootInformation
+          default: () => [
+            // h('span', { class: 'component-name' }, [element.componentName]),
+            h(markRaw(draggable), {
+              list: element.children,
+              animation: 340,
+              group: "componentsGroup",
+              class: "drag-wrapper",
+              itemKey: `${element.renderKey}`,
+              tag: element.type === 'flex' ? 'el-row' : 'span',
+              justify: element.justify,
+              align: element.align,
+              style: dragWrapperStyle(element)
+            }, {
+              item: (itemData) => {
+                const el = itemData.element
+                const ix = itemData.index
+                const layout = layouts[el.layout]
+                if (layout) {
+                  let child = layout.call(_this, h, el, ix, element.children, attrs)
+                  return [child]
+                } else {
+                  return null;
+                }
+              }
+            })
+            ,
+            components.itemBtns.apply(this, arguments)
+          ]
+        }),
+      ]
+    }
+    );
+
+  },
+  't-table'(h, element, index, parent, attrs, formData, mode) {
+    const { onActiveItem } = attrs
+    const className = this.activeId === element.formId ? 't-table-wrap active' : 't-table-wrap'
+    const _this = this
+
+    return h('div', {
+      class: className
+    }, {
+      default: ()=>[
+        h(Table, {
+          tableData: [],
+          columns: [],
+          class: 't-table',
+          onClick: (event) => {
+            onActiveItem && onActiveItem(element);
+            event.stopPropagation();
+          },
+        })
+      ]
+    })
+
+    return h(Table, {
+      tableData: [],
+      columns: [{ label: '姓名', prop: 'data' },{ label: '姓名', prop: 'data2' },{ label: '姓名', prop: 'data1' }],
+      class: className,
+      style: {
+        // border: "1px dashed #ccc"
+      },
+      onClick: (event) => {
+        onActiveItem && onActiveItem(element);
+        event.stopPropagation();
+      },
+    })
+  },
+  't-search'(h, element, index, parent, attrs, formData, mode) {
+    const { onActiveItem } = attrs
+    const className = this.activeId === element.formId ? 't-search active' : 't-search'
+    const _this = this
+
+    return h(Tsearch, {
+      searchForm: {},
+      config:[],
+      class: className,
+      onClick: (event) => {
+        onActiveItem && onActiveItem(element);
+        event.stopPropagation();
+      },
     })
   }
 }
@@ -173,13 +402,17 @@ export default defineComponent({
     formData: {
       type: Object,
       default: () => { }
-    }
+    },
+    mode: { // 运行模式 desgin  runtime
+        type: String,
+        default: 'desgin'
+    },
   },
   setup(props, { attrs }) {
     const layout = layouts[props.element.layout]
     console.log('props.element', props.element, props.index)
     if (layout) {
-      return () => layout.call(props, h, props.element, props.index, props.drawingList, attrs, props.formData)
+      return () => layout.call(props, h, props.element, props.index, props.drawingList, attrs, props.formData, props.mode)
     }
     return () => layoutIsNotFound(this)
   },
@@ -203,6 +436,7 @@ function getDrawingRowItem(params) {
       }
     }
   }
+  console.log('obj:', obj)
   return obj
 }
 function dragWrapperStyle(params) {
